@@ -5,6 +5,7 @@ from requests_oauthlib import OAuth1Session
 import json
 import yaml
 import sys
+import httplib
 import pprint
 
 class Tweet(object):
@@ -41,7 +42,7 @@ class Tweet(object):
             if responce.status_code == 200:
                 return json.loads(responce.text)
             else:
-                raise TweetError("ErrorCode: %d" % responce.status_code)
+                raise TweetError("Error: %d %s" % (responce.status_code, httplib.responses[responce.status_code]))
         else:
             raise TweetError("Not create oath session yet")
 
