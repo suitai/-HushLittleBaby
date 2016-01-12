@@ -86,6 +86,7 @@ class Tweet(object):
             user = tweet[u'user']
             print ("[%d] %s" % (tweet[u'id'], tweet[u'created_at'])).encode('utf-8')
             print ("[%d] %s @%s" % (user[u'id'], user[u'name'], user[u'screen_name'])).encode('utf-8')
+            print ("retweet: %d, favourite: %d" % (tweet[u'retweet_count'], tweet[u'favorite_count'])).encode('utf-8')
             print (tweet[u'text']).encode('utf-8')
             if "media" in tweet[u'entities']:
                 for media in tweet[u'entities'][u'media']:
