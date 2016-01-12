@@ -55,9 +55,8 @@ class Tweet(object):
     def search_tweets(self, search_term):
         params = {
                 "q": unicode(str(search_term)),
-                "lang": "ja",
                 "result_type": "recent",
-                "count": "15"
+                "include_entities": True
                 }
         self.tweets = self.oath_get("search", params = params)['statuses']
 
@@ -68,21 +67,19 @@ class Tweet(object):
     def get_list(self, list_id, slug):
         params = {
                 "list_id": list_id,
-                "slug": slug
+                "slug": slug,
+                "include_entities": True
                 }
         self.tweets = self.oath_get("list_statuse", params = params)
 
     def get_list_by_name(self, list_name):
-        params = {}
-        self.lists = self.oath_get("list", params = params)
+        self.get_lists()
         for tweet_list in self.lists:
             if tweet_list[u'name'] == list_name:
-                list_id = tweet_list[u'id']
-                slug = tweet_list[u'slug']
+                self.get_list(tweet_list[u'id'], tweet_list[u'slug'])
                 break
         else:
             raise TweetError("Cannot find list")
-        self.get_list(list_id, slug)
 
     def print_tweets(self):
         for tweet in self.tweets:
@@ -126,7 +123,7 @@ def tweet_search_tweets(argvs):
         tweet.search_tweets(argvs[2])
         tweet.print_tweets()
     else:
-        print "Usage: %s %s [search term]" % (argvs[0], argvs[1])
+        print "Usage: %s %s \"search term\"" % (argvs[0], argvs[1])
 
 def tweet_show_list(argvs):
     if len(argvs) > 2:
@@ -134,7 +131,7 @@ def tweet_show_list(argvs):
         tweet.get_list_by_name(argvs[2])
         tweet.print_tweets()
     else:
-        print "Usage: %s %s [list name]" % (argvs[0], argvs[1])
+        print "Usage: %s %s \"list name\"" % (argvs[0], argvs[1])
 
 def tweet_show_lists(argvs):
     tweet = tweet_init()
