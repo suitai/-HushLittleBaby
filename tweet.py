@@ -13,8 +13,8 @@ class Tweet(object):
         self.urls = {
                 "search": "https://api.twitter.com/1.1/search/tweets.json",
                 "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
-                "list": "https://api.twitter.com/1.1/lists/list.json",
-                "list_statuse": "https://api.twitter.com/1.1/lists/statuses.json"
+                "lists": "https://api.twitter.com/1.1/lists/list.json",
+                "list": "https://api.twitter.com/1.1/lists/statuses.json"
                 }
         self.keys = None
         self.oath = None
@@ -60,21 +60,18 @@ class Tweet(object):
                 }
         self.tweets = self.oath_get("search", params = params)['statuses']
 
-    def get_lists(self):
-        params = {}
-        self.lists = self.oath_get("list", params = params)
-
     def get_list(self, list_id, slug):
         params = {
                 "list_id": list_id,
                 "slug": slug,
                 "include_entities": True
                 }
-        self.tweets = self.oath_get("list_statuse", params = params)
+        self.tweets = self.oath_get("list", params = params)
 
     def get_list_by_name(self, list_name):
-        self.get_lists()
-        for tweet_list in self.lists:
+        params = {}
+        lists = self.oath_get("lists", params = params)
+        for tweet_list in lists:
             if tweet_list[u'name'] == list_name:
                 self.get_list(tweet_list[u'id'], tweet_list[u'slug'])
                 break
@@ -92,10 +89,6 @@ class Tweet(object):
                 for media in tweet[u'entities'][u'media']:
                     print ("<%s>" % media[u'media_url']).encode('utf-8')
             print ""
-
-    def print_lists(self):
-        for tweet_list in self.lists:
-            print ("[%d] %s %s" % (tweet_list[u'id'], tweet_list[u'slug'], tweet_list[u'name'])).encode('utf-8')
 
 
 class TweetError(Exception):
@@ -134,15 +127,10 @@ def tweet_show_list(argvs):
     else:
         print "Usage: %s %s \"list name\"" % (argvs[0], argvs[1])
 
-def tweet_show_lists(argvs):
-    tweet = tweet_init()
-    tweet.get_lists()
-    tweet.print_lists()
 
 
 functions = {
         "show-timeline": tweet_show_timeline,
-        "show-lists": tweet_show_lists,
         "show-list": tweet_show_list,
         "search-tweets": tweet_search_tweets,
         }
