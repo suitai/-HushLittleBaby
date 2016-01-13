@@ -13,6 +13,7 @@ class Tweet(object):
         self.urls = {
                 "search": "https://api.twitter.com/1.1/search/tweets.json",
                 "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
+                "favorite": "https://api.twitter.com/1.1/favorites/list.json",
                 "lists": "https://api.twitter.com/1.1/lists/list.json",
                 "list": "https://api.twitter.com/1.1/lists/statuses.json"
                 }
@@ -51,6 +52,12 @@ class Tweet(object):
                 "include_entities": True
                 }
         self.tweets = self.get_from_oath("timeline", params = params)
+
+    def get_favorite(self):
+        params = {
+                "include_entities": True
+                }
+        self.tweets = self.get_from_oath("favorite", params = params)
 
     def search_tweets(self, search_term):
         params = {
@@ -112,6 +119,11 @@ def tweet_show_timeline(argvs):
     tweet.get_timeline()
     tweet.print_tweets()
 
+def tweet_show_favorite(argvs):
+    tweet = tweet_init()
+    tweet.get_favorite()
+    tweet.print_tweets()
+
 def tweet_search_tweets(argvs):
     if len(argvs) > 2:
         tweet = tweet_init()
@@ -131,6 +143,7 @@ def tweet_show_list(argvs):
 
 functions = {
         "timeline": tweet_show_timeline,
+        "favorite": tweet_show_favorite,
         "list": tweet_show_list,
         "search": tweet_search_tweets,
         }
