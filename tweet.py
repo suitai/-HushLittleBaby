@@ -54,7 +54,7 @@ class Tweet(object):
 
     def search_tweets(self, search_term):
         params = {
-                "q": unicode(str(search_term)),
+                "q": search_term,
                 "result_type": "recent",
                 "include_entities": True
                 }
