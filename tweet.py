@@ -130,9 +130,9 @@ def tweet_show_list(argvs):
 
 
 functions = {
-        "show-timeline": tweet_show_timeline,
-        "show-list": tweet_show_list,
-        "search-tweets": tweet_search_tweets,
+        "timeline": tweet_show_timeline,
+        "list": tweet_show_list,
+        "search": tweet_search_tweets,
         }
 
 
