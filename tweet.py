@@ -81,6 +81,7 @@ class Tweet(object):
     def print_tweets(self):
         for tweet in self.tweets:
             user = tweet[u'user']
+            print ("<https://twitter.com/%s/status/%d>" % (user[u'screen_name'], tweet[u'id']))
             print ("[%d] %s" % (tweet[u'id'], tweet[u'created_at'])).encode('utf-8')
             print ("[%d] %s @%s" % (user[u'id'], user[u'name'], user[u'screen_name'])).encode('utf-8')
             print ("retweet: %d, favourite: %d" % (tweet[u'retweet_count'], tweet[u'favorite_count'])).encode('utf-8')
