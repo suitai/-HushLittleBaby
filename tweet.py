@@ -36,7 +36,7 @@ class Tweet(object):
         else:
             raise TweetError("Not load keys yet")
 
-    def oath_get(self, url, params):
+    def get_from_oath(self, url, params):
         if self.oath != None:
             responce = self.oath.get(self.urls[url], params = params)
             if responce.status_code == 200:
@@ -50,7 +50,7 @@ class Tweet(object):
         params = {
                 "include_entities": True
                 }
-        self.tweets = self.oath_get("timeline", params = params)
+        self.tweets = self.get_from_oath("timeline", params = params)
 
     def search_tweets(self, search_term):
         params = {
@@ -58,7 +58,7 @@ class Tweet(object):
                 "result_type": "recent",
                 "include_entities": True
                 }
-        self.tweets = self.oath_get("search", params = params)['statuses']
+        self.tweets = self.get_from_oath("search", params = params)['statuses']
 
     def get_list(self, list_id, slug):
         params = {
@@ -66,11 +66,11 @@ class Tweet(object):
                 "slug": slug,
                 "include_entities": True
                 }
-        self.tweets = self.oath_get("list", params = params)
+        self.tweets = self.get_from_oath("list", params = params)
 
     def get_list_by_name(self, list_name):
         params = {}
-        lists = self.oath_get("lists", params = params)
+        lists = self.get_from_oath("lists", params = params)
         for tweet_list in lists:
             if tweet_list[u'name'] == list_name:
                 self.get_list(tweet_list[u'id'], tweet_list[u'slug'])
@@ -127,7 +127,6 @@ def tweet_show_list(argvs):
         tweet.print_tweets()
     else:
         print "Usage: %s %s \"list name\"" % (argvs[0], argvs[1])
-
 
 
 functions = {
