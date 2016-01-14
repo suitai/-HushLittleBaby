@@ -6,7 +6,9 @@ import json
 import yaml
 import sys
 import httplib
+import getopt
 import pprint
+
 
 class Tweet(object):
     def __init__(self):
@@ -47,40 +49,44 @@ class Tweet(object):
         else:
             raise TweetError("Not create oath session yet")
 
-    def get_timeline(self):
+    def get_timeline(self, count=20):
         params = {
+                "count": count,
                 "include_entities": True
                 }
         self.tweets = self.get_from_oath("timeline", params = params)
 
-    def get_favorite(self):
+    def get_favorite(self, count=20):
         params = {
+                "count": count,
                 "include_entities": True
                 }
         self.tweets = self.get_from_oath("favorite", params = params)
 
-    def search_tweets(self, search_term):
+    def search_tweets(self, search_term, count=20):
         params = {
                 "q": search_term,
                 "result_type": "recent",
+                "count": count,
                 "include_entities": True
                 }
         self.tweets = self.get_from_oath("search", params = params)['statuses']
 
-    def get_list(self, list_id, slug):
+    def get_list(self, list_id, slug, count=20):
         params = {
                 "list_id": list_id,
                 "slug": slug,
+                "count": count,
                 "include_entities": True
                 }
         self.tweets = self.get_from_oath("list", params = params)
 
-    def get_list_by_name(self, list_name):
+    def get_list_by_name(self, list_name, count=20):
         params = {}
         lists = self.get_from_oath("lists", params = params)
         for tweet_list in lists:
             if tweet_list[u'name'] == list_name:
-                self.get_list(tweet_list[u'id'], tweet_list[u'slug'])
+                self.get_list(tweet_list[u'id'], tweet_list[u'slug'], count=count)
                 break
         else:
             raise TweetError("Cannot find list")
@@ -110,38 +116,52 @@ class TweetError(Exception):
 
 
 ### Functions
+def check_optlist(optlist):
+    option = {
+            "count": None
+            }
+    for opt, arg in optlist:
+        if opt == "-n":
+            option['count'] = int(arg)
+        else:
+            assert False, "unhandled option"
+    return option
+
 def tweet_init():
     tweet = Tweet()
     tweet.load_keys()
     tweet.create_session()
     return tweet
 
-def tweet_show_timeline(argvs):
+def tweet_show_timeline(args, optlist):
+    opt = check_optlist(optlist)
     tweet = tweet_init()
-    tweet.get_timeline()
+    tweet.get_timeline(count = opt['count'])
     tweet.print_tweets()
 
-def tweet_show_favorite(argvs):
+def tweet_show_favorite(args, optlist):
+    opt = check_optlist(optlist)
     tweet = tweet_init()
-    tweet.get_favorite()
+    tweet.get_favorite(count = opt['count'])
     tweet.print_tweets()
 
-def tweet_search_tweets(argvs):
-    if len(argvs) > 2:
+def tweet_search_tweets(args, optlist):
+    if len(args) > 2:
+        opt = check_optlist(optlist)
         tweet = tweet_init()
-        tweet.search_tweets(argvs[2])
+        tweet.search_tweets(args[2], count = opt['count'])
         tweet.print_tweets()
     else:
-        print "Usage: %s %s \"search term\"" % (argvs[0], argvs[1])
+        print "Usage: %s %s \"search term\"" % (args[0], args[1])
 
-def tweet_show_list(argvs):
-    if len(argvs) > 2:
+def tweet_show_list(args, optlist):
+    if len(args) > 2:
+        opt = check_optlist(optlist)
         tweet = tweet_init()
-        tweet.get_list_by_name(argvs[2])
+        tweet.get_list_by_name(args[2], count = opt['count'])
         tweet.print_tweets()
     else:
-        print "Usage: %s %s \"list name\"" % (argvs[0], argvs[1])
-
+        print "Usage: %s %s \"list name\"" % (args[0], args[1])
 
 functions = {
         "timeline": tweet_show_timeline,
@@ -153,8 +173,13 @@ functions = {
 
 ### Execute
 if __name__ == "__main__":
-    argvs = sys.argv
-    if (len(argvs) > 1) and (argvs[1] in functions.keys()):
-       functions[argvs[1]](argvs)
+    raw_args = sys.argv
+    try:
+        optlist, args = getopt.getopt(raw_args[1:], 'n:')
+    except getopt.GetoptError as detail:
+        sys.exit("GetoptError: %s" % detail)
+    args.insert(0, raw_args[0])
+    if (len(args) > 1) and (args[1] in functions.keys()):
+       functions[args[1]](args, optlist)
     else:
-        print "Usage: %s %s [option]" % (argvs[0], functions.keys())
+        print "Usage: [option] %s %s [args]" % (args[0], functions.keys())
