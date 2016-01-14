@@ -45,7 +45,7 @@ class Tweet(object):
             if responce.status_code == 200:
                 return json.loads(responce.text)
             else:
-                raise TweetError("Error: %d %s" % (responce.status_code, httplib.responses[responce.status_code]))
+                raise TweetError("%d %s" % (responce.status_code, httplib.responses[responce.status_code]))
         else:
             assert False, "not create oath session yet"
 
@@ -89,7 +89,7 @@ class Tweet(object):
                 self.get_list(tweet_list[u'id'], tweet_list[u'slug'], count=count)
                 break
         else:
-            raise TweetError("Cannot find list")
+            raise TweetError("Cannot find list \"%s\"" % list_name)
 
     def print_tweets(self):
         for tweet in self.tweets:
@@ -182,4 +182,4 @@ if __name__ == "__main__":
     if (len(args) > 1) and (args[1] in functions.keys()):
        functions[args[1]](args, optlist)
     else:
-        print "Usage: [option] %s %s [args]" % (args[0], functions.keys())
+        print "Usage: %s [option] %s [args]" % (args[0], functions.keys())
