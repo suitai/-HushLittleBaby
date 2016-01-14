@@ -37,7 +37,7 @@ class Tweet(object):
                     self.keys['access_token_secret']
                     )
         else:
-            raise TweetError("Not load keys yet")
+            assert False, "not load keys yet"
 
     def get_from_oath(self, url, params):
         if self.oath != None:
@@ -47,7 +47,7 @@ class Tweet(object):
             else:
                 raise TweetError("Error: %d %s" % (responce.status_code, httplib.responses[responce.status_code]))
         else:
-            raise TweetError("Not create oath session yet")
+            assert False, "not create oath session yet"
 
     def get_timeline(self, count=20):
         params = {
