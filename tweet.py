@@ -22,6 +22,11 @@ class Tweet(object):
         self.keys = None
         self.oath = None
         self.tweets = None
+        self.params = {}
+
+    def add_params(self, params):
+        for key, value in params.iteritems():
+            self.params[key] = value
 
     def load_keys(self, filename="keys.yaml"):
         with open(filename, 'r') as stream:
@@ -49,43 +54,30 @@ class Tweet(object):
         else:
             assert False, "not create oath session yet"
 
-    def get_timeline(self, count=20):
-        params = {
-                "count": count,
-                "include_entities": True
-                }
-        self.tweets = self.get_from_oath("timeline", params = params)
+    def get_timeline(self):
+        self.params['include_entities'] = True
+        self.tweets = self.get_from_oath("timeline", params=self.params)
 
-    def get_favorite(self, count=20):
-        params = {
-                "count": count,
-                "include_entities": True
-                }
-        self.tweets = self.get_from_oath("favorite", params = params)
+    def get_favorite(self):
+        self.params['include_entities'] = True
+        self.tweets = self.get_from_oath("favorite", params=self.params)
 
-    def search_tweets(self, search_term, count=20):
-        params = {
-                "q": search_term,
-                "result_type": "recent",
-                "count": count,
-                "include_entities": True
-                }
-        self.tweets = self.get_from_oath("search", params = params)['statuses']
+    def search_tweets(self, search_term):
+        self.params['q'] = search_term
+        self.params['result_type'] = "recent"
+        self.params['include_entities'] = True
+        self.tweets = self.get_from_oath("search", params=self.params)['statuses']
 
-    def get_list(self, list_id, count=20):
-        params = {
-                "list_id": list_id,
-                "count": count,
-                "include_entities": True
-                }
-        self.tweets = self.get_from_oath("list", params = params)
+    def get_list(self, list_id):
+        self.params['list_id'] = list_id
+        self.params['include_entities'] = True
+        self.tweets = self.get_from_oath("list", params=self.params)
 
-    def get_list_by_name(self, list_name, count=20):
-        params = {}
-        lists = self.get_from_oath("lists", params = params)
+    def get_list_by_name(self, list_name):
+        lists = self.get_from_oath("lists", params={})
         for tweet_list in lists:
             if tweet_list[u'name'] == list_name:
-                self.get_list(tweet_list[u'id'], count=count)
+                self.get_list(tweet_list[u'id'])
                 break
         else:
             raise TweetError("Cannot find list \"%s\"" % list_name)
@@ -116,12 +108,14 @@ class TweetError(Exception):
 
 ### Functions
 def check_optlist(optlist):
-    option = {
-            "count": None
+    option = {}
+    option_keys = {
+            "-n": "count",
+            "-s": "since_id"
             }
     for opt, arg in optlist:
-        if opt == "-n":
-            option['count'] = int(arg)
+        if opt in option_keys.keys():
+            option[option_keys[opt]] = int(arg)
         else:
             assert False, "unhandled option"
     return option
@@ -135,20 +129,23 @@ def tweet_init():
 def tweet_show_timeline(args, optlist):
     opt = check_optlist(optlist)
     tweet = tweet_init()
-    tweet.get_timeline(count = opt['count'])
+    tweet.add_params(opt)
+    tweet.get_timeline()
     tweet.print_tweets()
 
 def tweet_show_favorite(args, optlist):
     opt = check_optlist(optlist)
     tweet = tweet_init()
-    tweet.get_favorite(count = opt['count'])
+    tweet.add_params(opt)
+    tweet.get_favorite()
     tweet.print_tweets()
 
 def tweet_search_tweets(args, optlist):
     if len(args) > 2:
         opt = check_optlist(optlist)
         tweet = tweet_init()
-        tweet.search_tweets(args[2], count = opt['count'])
+        tweet.add_params(opt)
+        tweet.search_tweets(args[2])
         tweet.print_tweets()
     else:
         print "Usage: %s %s \"search term\"" % (args[0], args[1])
@@ -157,10 +154,12 @@ def tweet_show_list(args, optlist):
     if len(args) > 2:
         opt = check_optlist(optlist)
         tweet = tweet_init()
-        tweet.get_list_by_name(args[2], count = opt['count'])
+        tweet.add_params(opt)
+        tweet.get_list_by_name(args[2])
         tweet.print_tweets()
     else:
         print "Usage: %s %s \"list name\"" % (args[0], args[1])
+
 
 functions = {
         "timeline": tweet_show_timeline,
@@ -174,7 +173,7 @@ functions = {
 if __name__ == "__main__":
     raw_args = sys.argv
     try:
-        optlist, args = getopt.getopt(raw_args[1:], 'n:')
+        optlist, args = getopt.getopt(raw_args[1:], 'n:s:')
     except getopt.GetoptError as detail:
         sys.exit("GetoptError: %s" % detail)
     args.insert(0, raw_args[0])
