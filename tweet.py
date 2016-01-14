@@ -72,10 +72,9 @@ class Tweet(object):
                 }
         self.tweets = self.get_from_oath("search", params = params)['statuses']
 
-    def get_list(self, list_id, slug, count=20):
+    def get_list(self, list_id, count=20):
         params = {
                 "list_id": list_id,
-                "slug": slug,
                 "count": count,
                 "include_entities": True
                 }
@@ -86,7 +85,7 @@ class Tweet(object):
         lists = self.get_from_oath("lists", params = params)
         for tweet_list in lists:
             if tweet_list[u'name'] == list_name:
-                self.get_list(tweet_list[u'id'], tweet_list[u'slug'], count=count)
+                self.get_list(tweet_list[u'id'], count=count)
                 break
         else:
             raise TweetError("Cannot find list \"%s\"" % list_name)
@@ -180,6 +179,9 @@ if __name__ == "__main__":
         sys.exit("GetoptError: %s" % detail)
     args.insert(0, raw_args[0])
     if (len(args) > 1) and (args[1] in functions.keys()):
-       functions[args[1]](args, optlist)
+        try:
+            functions[args[1]](args, optlist)
+        except TweetError as detail:
+            sys.exit("Error: %s" % detail)
     else:
         print "Usage: %s [option] %s [args]" % (args[0], functions.keys())
