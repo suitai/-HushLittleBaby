@@ -68,9 +68,9 @@ class Tweet(object):
         self.params['include_entities'] = True
         return self.get_from_oath("favorite", params=self.params)
 
-    def search_tweets(self, search_term):
+    def search_tweets(self, search_term, result_type="recent"):
         self.params['q'] = search_term
-        self.params['result_type'] = "recent"
+        self.params['result_type'] = result_type
         self.params['include_entities'] = True
         return self.get_from_oath("search", params=self.params)['statuses']
 
