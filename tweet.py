@@ -18,7 +18,14 @@ class Tweet(object):
                 "favorite": "https://api.twitter.com/1.1/favorites/list.json",
                 "lists": "https://api.twitter.com/1.1/lists/list.json",
                 "list": "https://api.twitter.com/1.1/lists/statuses.json",
-                "user": "https://api.twitter.com/1.1/statuses/user_timeline.json"
+                "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
+                "trends": "https://api.twitter.com/1.1/trends/place.json"
+                }
+        self.woeid = {
+                "Japan": 23424856,
+                "Tokyo": 1118370,
+                "Osaka": 15015370,
+                "Nagoya": 1117817
                 }
         self.keys = None
         self.oath = None
@@ -90,6 +97,10 @@ class Tweet(object):
         self.params['include_entities'] = True
         return self.get_from_oath("user", params=self.params)
 
+    def get_trends(self, location="Japan"):
+        self.params['id'] = self.woeid[location]
+        return self.get_from_oath("trends", params=self.params)
+
 
 class TweetError(Exception):
     def __init__(self, value):
@@ -114,6 +125,16 @@ def print_tweets(tweets):
             for media in tweet[u'entities'][u'media']:
                 print ("<%s>" % media[u'media_url']).encode('utf-8')
         print ""
+
+def print_trends(trends):
+    message = []
+    for trend in trends:
+        for location in trend[u'locations']:
+            message.append(location[u'name'])
+        for i, t in enumerate(trend[u'trends'], 1):
+            message.append("%2d %s" % (i, t[u'name']))
+        message.append("")
+    print ("\n".join(message)).encode('utf-8')
 
 def check_optlist(optlist):
     option = {}
@@ -178,6 +199,11 @@ def tweet_show_user(args, optlist):
     else:
         print "Usage: %s %s \"screen name\"" % (args[0], args[1])
 
+def tweet_show_trends(args, optlist):
+    tweet = tweet_init()
+    trends = tweet.get_trends(location="Japan")
+    print_trends(trends)
+
 
 ### Execute
 if __name__ == "__main__":
@@ -186,7 +212,8 @@ if __name__ == "__main__":
         "favorite": tweet_show_favorite,
         "list": tweet_show_list,
         "search": tweet_search_tweets,
-        "user": tweet_show_user
+        "user": tweet_show_user,
+        "trends": tweet_show_trends
         }
     raw_args = sys.argv
     try:
