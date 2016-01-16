@@ -90,21 +90,6 @@ class Tweet(object):
         self.params['include_entities'] = True
         return self.get_from_oath("user", params=self.params)
 
-    def print_tweets(self, tweets):
-        for tweet in tweets:
-            user = tweet[u'user']
-            message =[]
-            message.append("<https://twitter.com/%s/status/%d>" % (user[u'screen_name'], tweet[u'id']))
-            message.append("[%d] %s" % (tweet[u'id'], tweet[u'created_at']))
-            message.append("[%d] %s @%s" % (user[u'id'], user[u'name'], user[u'screen_name']))
-            message.append("retweet: %d, favourite: %d" % (tweet[u'retweet_count'], tweet[u'favorite_count']))
-            message.append(tweet[u'text'])
-            print ("\n".join(message)).encode('utf-8')
-            if "media" in tweet[u'entities']:
-                for media in tweet[u'entities'][u'media']:
-                    print ("<%s>" % media[u'media_url']).encode('utf-8')
-            print ""
-
 
 class TweetError(Exception):
     def __init__(self, value):
@@ -115,6 +100,21 @@ class TweetError(Exception):
 
 
 ### Functions
+def print_tweets(tweets):
+    for tweet in tweets:
+        user = tweet[u'user']
+        message =[]
+        message.append("<https://twitter.com/%s/status/%d>" % (user[u'screen_name'], tweet[u'id']))
+        message.append("[%d] %s" % (tweet[u'id'], tweet[u'created_at']))
+        message.append("[%d] %s @%s" % (user[u'id'], user[u'name'], user[u'screen_name']))
+        message.append("retweet: %d, favourite: %d" % (tweet[u'retweet_count'], tweet[u'favorite_count']))
+        message.append(tweet[u'text'])
+        print ("\n".join(message)).encode('utf-8')
+        if "media" in tweet[u'entities']:
+            for media in tweet[u'entities'][u'media']:
+                print ("<%s>" % media[u'media_url']).encode('utf-8')
+        print ""
+
 def check_optlist(optlist):
     option = {}
     option_keys = {
@@ -139,14 +139,14 @@ def tweet_show_timeline(args, optlist):
     tweet = tweet_init()
     tweet.add_params(opt)
     tweets = tweet.get_timeline()
-    tweet.print_tweets(tweets)
+    print_tweets(tweets)
 
 def tweet_show_favorite(args, optlist):
     opt = check_optlist(optlist)
     tweet = tweet_init()
     tweet.add_params(opt)
     tweets = tweet.get_favorite()
-    tweet.print_tweets(tweets)
+    print_tweets(tweets)
 
 def tweet_search_tweets(args, optlist):
     if len(args) > 2:
@@ -154,7 +154,7 @@ def tweet_search_tweets(args, optlist):
         tweet = tweet_init()
         tweet.add_params(opt)
         tweets = tweet.search_tweets(args[2])
-        tweet.print_tweets(tweets)
+        print_tweets(tweets)
     else:
         print "Usage: %s %s \"search term\"" % (args[0], args[1])
 
@@ -164,7 +164,7 @@ def tweet_show_list(args, optlist):
         tweet = tweet_init()
         tweet.add_params(opt)
         tweets = tweet.get_list_by_name(args[2])
-        tweet.print_tweets(tweets)
+        print_tweets(tweets)
     else:
         print "Usage: %s %s \"list name\"" % (args[0], args[1])
 
@@ -174,7 +174,7 @@ def tweet_show_user(args, optlist):
         tweet = tweet_init()
         tweet.add_params(opt)
         tweets = tweet.get_user(args[2])
-        tweet.print_tweets(tweets)
+        print_tweets(tweets)
     else:
         print "Usage: %s %s \"screen name\"" % (args[0], args[1])
 
