@@ -112,19 +112,19 @@ class TweetError(Exception):
 
 ### Functions
 def print_tweets(tweets):
+    message =[]
     for tweet in tweets:
         user = tweet[u'user']
-        message =[]
         message.append("<https://twitter.com/%s/status/%d>" % (user[u'screen_name'], tweet[u'id']))
         message.append("[%d] %s" % (tweet[u'id'], tweet[u'created_at']))
         message.append("[%d] %s @%s" % (user[u'id'], user[u'name'], user[u'screen_name']))
         message.append("retweet: %d, favourite: %d" % (tweet[u'retweet_count'], tweet[u'favorite_count']))
         message.append(tweet[u'text'])
-        print ("\n".join(message)).encode('utf-8')
         if "media" in tweet[u'entities']:
             for media in tweet[u'entities'][u'media']:
-                print ("<%s>" % media[u'media_url']).encode('utf-8')
-        print ""
+                message.append("<%s>" % media[u'media_url'])
+        message.append("")
+    print ("\n".join(message)).encode('utf-8')
 
 def print_trends(trends):
     message = []
