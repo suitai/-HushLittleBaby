@@ -4,14 +4,12 @@
 from requests_oauthlib import OAuth1Session
 import json
 import yaml
-import sys
 import httplib
-import getopt
 import pprint
 
 
 class Tweet(object):
-    def __init__(self):
+    def __init__(self, filename="keys.yaml"):
         self.urls = {
                 "search": "https://api.twitter.com/1.1/search/tweets.json",
                 "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
@@ -31,11 +29,14 @@ class Tweet(object):
         self.oath = None
         self.params = {}
 
+        self.load_keys(filename)
+        self.create_session()
+
     def add_params(self, params):
         for key, value in params.iteritems():
             self.params[key] = value
 
-    def load_keys(self, filename="keys.yaml"):
+    def load_keys(self, filename):
         with open(filename, 'r') as stream:
             self.keys = yaml.load(stream)
         # TODO ファイルチェック
@@ -149,22 +150,16 @@ def check_optlist(optlist):
             assert False, "unhandled option"
     return option
 
-def tweet_init():
-    tweet = Tweet()
-    tweet.load_keys()
-    tweet.create_session()
-    return tweet
-
 def tweet_show_timeline(args, optlist):
     opt = check_optlist(optlist)
-    tweet = tweet_init()
+    tweet = Tweet()
     tweet.add_params(opt)
     tweets = tweet.get_timeline()
     print_tweets(tweets)
 
 def tweet_show_favorite(args, optlist):
     opt = check_optlist(optlist)
-    tweet = tweet_init()
+    tweet = Tweet()
     tweet.add_params(opt)
     tweets = tweet.get_favorite()
     print_tweets(tweets)
@@ -172,7 +167,7 @@ def tweet_show_favorite(args, optlist):
 def tweet_search_tweets(args, optlist):
     if len(args) > 2:
         opt = check_optlist(optlist)
-        tweet = tweet_init()
+        tweet = Tweet()
         tweet.add_params(opt)
         tweets = tweet.search_tweets(args[2])
         print_tweets(tweets)
@@ -182,7 +177,7 @@ def tweet_search_tweets(args, optlist):
 def tweet_show_list(args, optlist):
     if len(args) > 2:
         opt = check_optlist(optlist)
-        tweet = tweet_init()
+        tweet = Tweet()
         tweet.add_params(opt)
         tweets = tweet.get_list_by_name(args[2])
         print_tweets(tweets)
@@ -192,7 +187,7 @@ def tweet_show_list(args, optlist):
 def tweet_show_user(args, optlist):
     if len(args) > 2:
         opt = check_optlist(optlist)
-        tweet = tweet_init()
+        tweet = Tweet()
         tweet.add_params(opt)
         tweets = tweet.get_user(args[2])
         print_tweets(tweets)
@@ -207,6 +202,9 @@ def tweet_show_trends(args, optlist):
 
 ### Execute
 if __name__ == "__main__":
+    import sys
+    import getopt
+
     functions = {
         "timeline": tweet_show_timeline,
         "favorite": tweet_show_favorite,
