@@ -17,7 +17,8 @@ class Tweet(object):
                 "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
                 "favorite": "https://api.twitter.com/1.1/favorites/list.json",
                 "lists": "https://api.twitter.com/1.1/lists/list.json",
-                "list": "https://api.twitter.com/1.1/lists/statuses.json"
+                "list": "https://api.twitter.com/1.1/lists/statuses.json",
+                "user": "https://api.twitter.com/1.1/statuses/user_timeline.json"
                 }
         self.keys = None
         self.oath = None
@@ -83,6 +84,11 @@ class Tweet(object):
     def get_list_by_name(self, list_name):
         list_id = self.search_list(list_name)
         return self.get_list(list_id)
+
+    def get_user(self, screen_name):
+        self.params['screen_name'] = screen_name
+        self.params['include_entities'] = True
+        return self.get_from_oath("user", params=self.params)
 
     def print_tweets(self, tweets):
         for tweet in tweets:
@@ -162,6 +168,16 @@ def tweet_show_list(args, optlist):
     else:
         print "Usage: %s %s \"list name\"" % (args[0], args[1])
 
+def tweet_show_user(args, optlist):
+    if len(args) > 2:
+        opt = check_optlist(optlist)
+        tweet = tweet_init()
+        tweet.add_params(opt)
+        tweets = tweet.get_user(args[2])
+        tweet.print_tweets(tweets)
+    else:
+        print "Usage: %s %s \"screen name\"" % (args[0], args[1])
+
 
 ### Execute
 if __name__ == "__main__":
@@ -170,6 +186,7 @@ if __name__ == "__main__":
         "favorite": tweet_show_favorite,
         "list": tweet_show_list,
         "search": tweet_search_tweets,
+        "user": tweet_show_user
         }
     raw_args = sys.argv
     try:
