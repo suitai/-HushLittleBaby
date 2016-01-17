@@ -25,6 +25,11 @@ class Tweet(object):
                 "Osaka": 15015370,
                 "Nagoya": 1117817
                 }
+        self.param_keys = [
+                "count",
+                "since_id",
+                "max_id"
+                ]
         self.keys = None
         self.oath = None
         self.params = {}
@@ -34,7 +39,8 @@ class Tweet(object):
 
     def add_params(self, params):
         for key, value in params.iteritems():
-            self.params[key] = value
+            if key in self.param_keys:
+                self.params[key] = value
 
     def load_keys(self, filename):
         with open(filename, 'r') as stream:
