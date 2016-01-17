@@ -195,7 +195,7 @@ def tweet_show_user(args, optlist):
         print "Usage: %s %s \"screen name\"" % (args[0], args[1])
 
 def tweet_show_trends(args, optlist):
-    tweet = tweet_init()
+    tweet = Tweet()
     trends = tweet.get_trends(location="Japan")
     print_trends(trends)
 
