@@ -141,7 +141,8 @@ def check_optlist(optlist):
     option = {}
     option_keys = {
             "-n": "count",
-            "-s": "since_id"
+            "-s": "since_id",
+            "-m": "max_id"
             }
     for opt, arg in optlist:
         if opt in option_keys.keys():
@@ -215,7 +216,7 @@ if __name__ == "__main__":
         }
     raw_args = sys.argv
     try:
-        optlist, args = getopt.getopt(raw_args[1:], 'n:s:')
+        optlist, args = getopt.getopt(raw_args[1:], 'm:n:s:')
     except getopt.GetoptError as detail:
         sys.exit("GetoptError: %s" % detail)
     args.insert(0, raw_args[0])
