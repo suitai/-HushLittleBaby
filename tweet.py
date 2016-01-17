@@ -5,6 +5,7 @@ from requests_oauthlib import OAuth1Session
 import json
 import yaml
 import httplib
+import os
 import pprint
 
 
@@ -43,6 +44,10 @@ class Tweet(object):
                 self.params[key] = value
 
     def load_keys(self, filename):
+        filename = os.path.expanduser(filename)
+        filename = os.path.expandvars(filename)
+        if not os.path.isfile(filename):
+            raise TweetError("Cannot find the keys file \"%s\"." % filename)
         with open(filename, 'r') as stream:
             self.keys = yaml.load(stream)
         # TODO ファイルチェック
