@@ -6,6 +6,8 @@ import json
 import yaml
 import httplib
 import os
+import sys
+import getopt
 import pprint
 
 
@@ -211,12 +213,7 @@ def tweet_show_trends(args, optlist):
     trends = tweet.get_trends(location="Japan")
     print_trends(trends)
 
-
-### Execute
-if __name__ == "__main__":
-    import sys
-    import getopt
-
+def main():
     functions = {
         "timeline": tweet_show_timeline,
         "favorite": tweet_show_favorite,
@@ -238,3 +235,9 @@ if __name__ == "__main__":
             sys.exit("Error: %s" % detail)
     else:
         print "Usage: %s [option] %s [args]" % (args[0], functions.keys())
+
+
+### Execute
+if __name__ == "__main__":
+    main()
+
