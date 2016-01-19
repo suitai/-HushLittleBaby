@@ -12,7 +12,7 @@ import pprint
 
 
 class Tweet(object):
-    def __init__(self, filename="keys.yaml"):
+    def __init__(self, filename):
         self.urls = {
                 "search": "https://api.twitter.com/1.1/search/tweets.json",
                 "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
@@ -155,61 +155,57 @@ def check_optlist(optlist):
     option_keys = {
             "-n": "count",
             "-s": "since_id",
-            "-m": "max_id"
+            "-m": "max_id",
+            "-k": "keyfile"
             }
     for opt, arg in optlist:
         if opt in option_keys.keys():
-            option[option_keys[opt]] = int(arg)
+            option[option_keys[opt]] = arg
         else:
             assert False, "unhandled option"
     return option
 
-def tweet_show_timeline(args, optlist):
-    opt = check_optlist(optlist)
-    tweet = Tweet()
+def tweet_show_timeline(args, opt, filename):
+    tweet = Tweet(filename)
     tweet.add_params(opt)
     tweets = tweet.get_timeline()
     print_tweets(tweets)
 
-def tweet_show_favorite(args, optlist):
-    opt = check_optlist(optlist)
-    tweet = Tweet()
+def tweet_show_favorite(args, opt, filename):
+    tweet = Tweet(filename)
     tweet.add_params(opt)
     tweets = tweet.get_favorite()
     print_tweets(tweets)
 
-def tweet_search_tweets(args, optlist):
+def tweet_search_tweets(args, opt, filename):
     if len(args) > 2:
-        opt = check_optlist(optlist)
-        tweet = Tweet()
+        tweet = Tweet(filename)
         tweet.add_params(opt)
         tweets = tweet.search_tweets(args[2])
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"search term\"" % (args[0], args[1])
 
-def tweet_show_list(args, optlist):
+def tweet_show_list(args, opt, filename):
     if len(args) > 2:
-        opt = check_optlist(optlist)
-        tweet = Tweet()
+        tweet = Tweet(filename)
         tweet.add_params(opt)
         tweets = tweet.get_list_by_name(args[2])
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"list name\"" % (args[0], args[1])
 
-def tweet_show_user(args, optlist):
+def tweet_show_user(args, opt, filename):
     if len(args) > 2:
-        opt = check_optlist(optlist)
-        tweet = Tweet()
+        tweet = Tweet(filename)
         tweet.add_params(opt)
         tweets = tweet.get_user(args[2])
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"screen name\"" % (args[0], args[1])
 
-def tweet_show_trends(args, optlist):
-    tweet = Tweet()
+def tweet_show_trends(args, optlist, filename):
+    tweet = Tweet(filename)
     trends = tweet.get_trends(location="Japan")
     print_trends(trends)
 
@@ -228,9 +224,11 @@ def main():
     except getopt.GetoptError as detail:
         sys.exit("GetoptError: %s" % detail)
     args.insert(0, raw_args[0])
+    opt = check_optlist(optlist)
+    filename = opt['keyfile'] if opt.has_key('key_file') else "tweet_keys.yaml"
     if (len(args) > 1) and (args[1] in functions.keys()):
         try:
-            functions[args[1]](args, optlist)
+            functions[args[1]](args, opt, filename)
         except TweetError as detail:
             sys.exit("Error: %s" % detail)
     else:
