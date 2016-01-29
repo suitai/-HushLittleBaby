@@ -26,14 +26,14 @@ def download(url, out_dir, overwrite=False):
     file_size_dl = 0
     block_sz = 4096
     with open(out_file, 'wb') as stream:
-        while True:
+        while file_size:
             buffer = urlopen.read(block_sz)
             if not buffer:
                 break
 
             file_size_dl += len(buffer)
             stream.write(buffer)
-            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+            status = r"%10d/%10d  [%3.2f%%]" % (file_size_dl, file_size, file_size_dl * 100. / file_size)
             status = status + chr(8)*(len(status)+1)
             print status,
 
@@ -47,7 +47,7 @@ class DownloadError(Exception):
 
 
 def main():
-    out_dir = "./"
+    out_dir = "."
     overwrite = False
 
     try:
