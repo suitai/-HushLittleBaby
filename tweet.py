@@ -37,15 +37,15 @@ class Tweet(object):
         self.oath = None
         self.params = {}
 
-        self.load_keys(filename)
-        self.create_session()
+        self.__load_keys(filename)
+        self.__create_session()
 
     def add_params(self, params):
         for key, value in params.iteritems():
             if key in self.param_keys:
                 self.params[key] = value
 
-    def load_keys(self, filename):
+    def __load_keys(self, filename):
         filename = os.path.expanduser(filename)
         filename = os.path.expandvars(filename)
         if not os.path.isfile(filename):
@@ -54,7 +54,7 @@ class Tweet(object):
             self.keys = yaml.load(stream)
         # TODO ファイルチェック
 
-    def create_session(self):
+    def __create_session(self):
         if self.keys != None:
             self.oath = OAuth1Session(
                     self.keys['consumer_key'],
