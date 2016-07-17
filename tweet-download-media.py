@@ -7,8 +7,6 @@ import getopt
 import tweet
 import download
 
-etc_dir = "~/etc/MyTweetApp"
-
 ### Functions
 def check_optlist(optlist):
     option = {}
@@ -29,11 +27,10 @@ def check_optlist(optlist):
 def tweet_get_favorite_media(args, optlist):
     opt = check_optlist(optlist)
     out_dir = opt['out_dir'] if opt.has_key('out_dir') else "./"
-    key_file = opt['key_file'] if opt.has_key('key_file') else ("%s/keys.yaml" % etc_dir)
+    key_file = opt['key_file'] if opt.has_key('key_file') else ("tweet_keys.yaml")
 
     Tw = tweet.Tweet(key_file)
-    Tw.add_params(opt)
-    tweets = Tw.get_favorite()
+    tweets = Tw.get_favorite(opt)
     num = len(tweets)
     first_id = tweets[0][u'id']
     last_id = tweets[-1][u'id']

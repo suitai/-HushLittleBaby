@@ -28,22 +28,11 @@ class Tweet(object):
                 "Osaka": 15015370,
                 "Nagoya": 1117817
                 }
-        self.param_keys = [
-                "count",
-                "since_id",
-                "max_id"
-                ]
         self.keys = None
         self.oath = None
-        self.params = {}
 
         self.__load_keys(filename)
         self.__create_session()
-
-    def add_params(self, params):
-        for key, value in params.iteritems():
-            if key in self.param_keys:
-                self.params[key] = value
 
     def __load_keys(self, filename):
         filename = os.path.expanduser(filename)
@@ -74,24 +63,24 @@ class Tweet(object):
             assert False, "not create oath session yet"
         return json.loads(responce.text)
 
-    def get_timeline(self):
-        self.params['include_entities'] = True
-        return self.get_from_oath("timeline", params=self.params)
+    def get_timeline(self, params={}):
+        params['include_entities'] = True
+        return self.get_from_oath("timeline", params)
 
-    def get_favorite(self):
-        self.params['include_entities'] = True
-        return self.get_from_oath("favorite", params=self.params)
+    def get_favorite(self, params={}):
+        params['include_entities'] = True
+        return self.get_from_oath("favorite", params)
 
-    def search_tweets(self, search_term, result_type="recent"):
-        self.params['q'] = search_term
-        self.params['result_type'] = result_type
-        self.params['include_entities'] = True
-        return self.get_from_oath("search", params=self.params)['statuses']
+    def search_tweets(self, search_term, result_type="recent", params={}):
+        params['q'] = search_term
+        params['result_type'] = result_type
+        params['include_entities'] = True
+        return self.get_from_oath("search", params)['statuses']
 
-    def get_list(self, list_id):
-        self.params['list_id'] = list_id
-        self.params['include_entities'] = True
-        return self.get_from_oath("list", params=self.params)
+    def get_list(self, list_id, params={}):
+        params['list_id'] = list_id
+        params['include_entities'] = True
+        return self.get_from_oath("list", params)
 
     def search_list(self, list_name):
         lists = self.get_from_oath("lists", params={})
@@ -106,14 +95,14 @@ class Tweet(object):
         list_id = self.search_list(list_name)
         return self.get_list(list_id)
 
-    def get_user(self, screen_name):
-        self.params['screen_name'] = screen_name
-        self.params['include_entities'] = True
-        return self.get_from_oath("user", params=self.params)
+    def get_user(self, screen_name, params={}):
+        params['screen_name'] = screen_name
+        params['include_entities'] = True
+        return self.get_from_oath("user", params)
 
-    def get_trends(self, location="Japan"):
-        self.params['id'] = self.woeid[location]
-        return self.get_from_oath("trends", params=self.params)
+    def get_trends(self, location="Japan", params={}):
+        params['id'] = self.woeid[location]
+        return self.get_from_oath("trends", params)
 
 
 class TweetError(Exception):
@@ -167,21 +156,18 @@ def check_optlist(optlist):
 
 def tweet_show_timeline(args, opt, filename):
     tweet = Tweet(filename)
-    tweet.add_params(opt)
-    tweets = tweet.get_timeline()
+    tweets = tweet.get_timeline(params=opt)
     print_tweets(tweets)
 
 def tweet_show_favorite(args, opt, filename):
     tweet = Tweet(filename)
-    tweet.add_params(opt)
-    tweets = tweet.get_favorite()
+    tweets = tweet.get_favorite(params=opt)
     print_tweets(tweets)
 
 def tweet_search_tweets(args, opt, filename):
     if len(args) > 2:
         tweet = Tweet(filename)
-        tweet.add_params(opt)
-        tweets = tweet.search_tweets(args[2])
+        tweets = tweet.search_tweets(args[2], params=opt)
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"search term\"" % (args[0], args[1])
@@ -189,8 +175,7 @@ def tweet_search_tweets(args, opt, filename):
 def tweet_show_list(args, opt, filename):
     if len(args) > 2:
         tweet = Tweet(filename)
-        tweet.add_params(opt)
-        tweets = tweet.get_list_by_name(args[2])
+        tweets = tweet.get_list_by_name(args[2], params=opt)
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"list name\"" % (args[0], args[1])
@@ -198,15 +183,14 @@ def tweet_show_list(args, opt, filename):
 def tweet_show_user(args, opt, filename):
     if len(args) > 2:
         tweet = Tweet(filename)
-        tweet.add_params(opt)
-        tweets = tweet.get_user(args[2])
+        tweets = tweet.get_user(args[2], params=opt)
         print_tweets(tweets)
     else:
         print "Usage: %s %s \"screen name\"" % (args[0], args[1])
 
-def tweet_show_trends(args, optlist, filename):
+def tweet_show_trends(args, opt, filename):
     tweet = Tweet(filename)
-    trends = tweet.get_trends(location="Japan")
+    trends = tweet.get_trends(location="Japan", params=opt)
     print_trends(trends)
 
 def main():
