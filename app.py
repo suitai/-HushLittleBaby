@@ -60,8 +60,13 @@ def index():
     print "request_token: ", request_token
     access_token = __get_access_token(request_token)
     print "access_token: ", access_token
-    tweet = __get_tweet(access_token, "timeline")
-    return render_template('index.html', timeline=tweet)
+    tweets = __get_tweets(access_token, "timeline", {'count': 100})
+    with open("timeline.json", 'w') as f:
+        json.dump(tweets, f)
+    for t in tweets[:]:
+        if 'extended_entities' not in t.keys():
+            tweets.remove(t)
+    return render_template('index.html', tweets=tweets)
 
 
 def __get_request_token():
@@ -103,7 +108,7 @@ def __get_access_token(token):
     return access_token
 
 
-def __get_tweet(token, case, params={}):
+def __get_tweets(token, case, params={}):
     auth = OAuth1Session(CONSUMER_KEY, client_secret=CONSUMER_SECRET,
             resource_owner_key=token['oauth_token'],
             resource_owner_secret=token['oauth_token_secret'])

@@ -1,10 +1,18 @@
-<!DOCTYPE html>
 <html>
-    <head>
-    </head>
     <body>
-        {% for status in timeline %}
-        <p>{{ status.text }}</p>
+        {% for tweet in tweets %}
+        <div class tweet>
+            {% for media in tweet.extended_entities.media%}
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
+                <img src={{ media.media_url }}>
+            </a>
+            {% endfor %}
+            <p>{{ tweet.text }}</p>
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}">
+                <p>{{ tweet.user.screen_name }}</p>
+            </a>
+            <p> リツイート: {{ tweet.favorite_count }} いいね: {{ tweet.favorite_count }}</p>
+        </div>
         <hr>
         {% endfor %}
     </body>
