@@ -13,6 +13,7 @@ from flask import Flask, session, request, redirect, render_template
 CONSUMER_KEY = os.environ['CONSUMER_KEY']
 CONSUMER_SECRET = os.environ['CONSUMER_SECRET']
 CALLBACK_URL = os.environ['CALLBACK_URL']
+REQ_TOKEN = "req_token"
 ACS_TOKEN = "acs_token"
 URL= {
 'request_token': "https://api.twitter.com/oauth/request_token",
@@ -37,7 +38,8 @@ def before_request():
         return
     if session.get(ACS_TOKEN) is not None:
         return
-    token =  __get_token()
+    token =  __get_request_token()
+    print "request_token: ", token
     if token['oauth_token'] is not None and token['oauth_verifier'] is not None:
         return
     return redirect('/login')
@@ -54,28 +56,31 @@ def login():
 @app.route("/")
 def index():
     print "INFO: index"
-    token =  __get_token()
-    print "token: ", token
-    access_token = __get_access_token(token)
+    request_token =  __get_request_token()
+    print "request_token: ", request_token
+    access_token = __get_access_token(request_token)
     print "access_token: ", access_token
     tweet = __get_tweet(access_token, "timeline")
     return render_template('index.html', timeline=tweet)
 
 
-def __get_token():
-    token = {
+def __get_request_token():
+    if session.get(REQ_TOKEN):
+        return session.get(REQ_TOKEN)
+    request_token = {
             'oauth_token': request.values.get('oauth_token'),
             'oauth_token_secret': request.values.get('oauth_token_secret'),
             'oauth_verifier': request.values.get('oauth_verifier'),
             }
-    return token
+    session[REQ_TOKEN] = request_token
+    return request_token
 
 
 def __get_redirect_url():
     auth = OAuth1Session(CONSUMER_KEY, client_secret=CONSUMER_SECRET,
             callback_uri=CALLBACK_URL)
     try:
-        request_token = auth.fetch_request_token(URL['request_token'])
+        auth.fetch_request_token(URL['request_token'])
         redirect_url =  auth.authorization_url(URL['authenticate'])
     except Exception:
         raise
