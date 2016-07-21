@@ -49,6 +49,12 @@ def index():
     tweets = t.get_tweets("timeline", {'count': 100})
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
+
+    if isinstance(tweets, dict):
+        if 'error' in tweets.keys():
+            print "error: ", tweets
+            return redirect('/login')
+
     for t in tweets[:]:
         if 'extended_entities' not in t.keys():
             tweets.remove(t)
