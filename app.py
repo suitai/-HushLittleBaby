@@ -45,7 +45,7 @@ def login():
 def index():
     print "INFO: index"
     t = tweet.Tweet()
-    t.get_access_token()
+    t.set_access_token()
     tweets = t.get_tweets("timeline", {'count': 100})
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
