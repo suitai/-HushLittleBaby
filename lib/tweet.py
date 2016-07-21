@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+
 import os
 import json
 from requests_oauthlib import OAuth1Session
@@ -79,6 +80,7 @@ class Tweet(object):
         except Exception:
             raise
 
+
 def get_request_token():
     if session.get('request_token') is not None:
         request_token = session.get('request_token')
@@ -99,6 +101,7 @@ def check_token():
         return True
     else:
         return False
+
 
 def clean_session():
     for s in ['request_token', 'access_token']:
