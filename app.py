@@ -10,6 +10,7 @@ from datetime import timedelta
 from flask import Flask, session, request, redirect, render_template
 from lib import tweet
 
+CONFIG_FILE = "etc/tweet.json"
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
@@ -44,7 +45,7 @@ def login():
 @app.route("/")
 def index():
     print "INFO: index"
-    t = tweet.Tweet()
+    t = tweet.Tweet(CONFIG_FILE)
     t.set_access_token()
     tweets = t.get_tweets("timeline", {'count': 100})
     with open("timeline.json", 'w') as f:

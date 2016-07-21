@@ -9,33 +9,25 @@ from flask import session, request
 
 
 class Tweet(object):
-    def __init__(self):
-        self.urls = {
-                "request_token": "https://api.twitter.com/oauth/request_token",
-                "authenticate": "https://api.twitter.com/oauth/authenticate",
-                "access_token": "https://api.twitter.com/oauth/access_token",
-                "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
-                "search": "https://api.twitter.com/1.1/search/tweets.json",
-                "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
-                "favorite": "https://api.twitter.com/1.1/favorites/list.json",
-                "lists": "https://api.twitter.com/1.1/lists/list.json",
-                "list": "https://api.twitter.com/1.1/lists/statuses.json",
-                "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
-                "trends": "https://api.twitter.com/1.1/trends/place.json"
-                }
-        self.woeid = {
-                "Japan": 23424856,
-                "Tokyo": 1118370,
-                "Osaka": 15015370,
-                "Nagoya": 1117817
-                }
+    def __init__(self, filename):
+        self.urls = {}
+        self.woeids = {}
         self.keys = {}
+        self.load_config(filename)
         self.load_environ()
+
+    def load_config(self, filename):
+        with open(filename, 'r') as f:
+            config = json.load(f)
+        self.urls = config['urls']
+        self.woeids = config['woeids']
+        print "INFO: load_config"
 
     def load_environ(self):
         self.keys['consumer_key'] = os.environ['CONSUMER_KEY']
         self.keys['consumer_secret'] = os.environ['CONSUMER_SECRET']
         self.keys['callback_url'] = os.environ['CALLBACK_URL']
+        print "INFO: load_keys"
 
     def get_redirect_url(self):
         oauth = OAuth1Session(

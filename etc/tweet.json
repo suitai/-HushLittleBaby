@@ -1,0 +1,21 @@
+{
+  "urls": {
+    "oath2_token": "https://api.twitter.com/oauth2/token",
+    "request_token": "https://api.twitter.com/oauth/request_token",
+    "authenticate": "https://api.twitter.com/oauth/authenticate",
+    "access_token": "https://api.twitter.com/oauth/access_token",
+    "search": "https://api.twitter.com/1.1/search/tweets.json",
+    "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
+    "favorite": "https://api.twitter.com/1.1/favorites/list.json",
+    "lists": "https://api.twitter.com/1.1/lists/list.json",
+    "list": "https://api.twitter.com/1.1/lists/statuses.json",
+    "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
+    "trends": "https://api.twitter.com/1.1/trends/place.json"
+  },
+  "woeids": {
+    "Japan": 23424856,
+    "Tokyo": 1118370,
+    "Osaka": 15015370,
+    "Nagoya": 1117817
+  }
+}
