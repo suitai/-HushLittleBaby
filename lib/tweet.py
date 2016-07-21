@@ -29,9 +29,9 @@ class Tweet(object):
                 "Nagoya": 1117817
                 }
         self.keys = {}
-        self.load_keys()
+        self.load_environ()
 
-    def load_keys(self):
+    def load_environ(self):
         self.keys['consumer_key'] = os.environ['CONSUMER_KEY']
         self.keys['consumer_secret'] = os.environ['CONSUMER_SECRET']
         self.keys['callback_url'] = os.environ['CALLBACK_URL']
