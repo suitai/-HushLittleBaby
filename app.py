@@ -6,6 +6,7 @@ import os
 import sys
 import logging
 import json
+from datetime import timedelta
 from flask import Flask, session, request, redirect, render_template
 from lib import tweet
 
@@ -26,6 +27,9 @@ def before_request():
     elif tweet.check_token():
         return
     else:
+        tweet.clean_session()
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=5)
         return redirect('/login')
 
 

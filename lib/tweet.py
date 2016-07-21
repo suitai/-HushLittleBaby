@@ -47,20 +47,25 @@ class Tweet(object):
         except Exception:
             raise
 
-    def get_access_token(self):
-        request_token = get_request_token()
-        oauth = OAuth1Session(
-                self.keys['consumer_key'],
-                client_secret=self.keys['consumer_secret'],
-                resource_owner_key=request_token['oauth_token'],
-                verifier=request_token['oauth_verifier'])
-        try:
-            access_token = oauth.fetch_access_token(self.urls['access_token'])
-            self.keys['access_token'] = access_token['oauth_token']
-            self.keys['access_token_secret'] = access_token['oauth_token_secret']
-            print "access_token: ", access_token
-        except Exception:
-            raise
+    def set_access_token(self):
+        if session.get('access_token') is not None:
+            access_token = session.get('access_token')
+        else:
+            request_token = get_request_token()
+            oauth = OAuth1Session(
+                    self.keys['consumer_key'],
+                    client_secret=self.keys['consumer_secret'],
+                    resource_owner_key=request_token['oauth_token'],
+                    verifier=request_token['oauth_verifier'])
+            try:
+                access_token = oauth.fetch_access_token(self.urls['access_token'])
+            except Exception:
+                raise
+            if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
+                session['access_token'] = access_token
+        self.keys['access_token'] = access_token['oauth_token']
+        self.keys['access_token_secret'] = access_token['oauth_token_secret']
+        print "access_token: ", access_token
 
     def get_tweets(self, case, params={}):
         oauth = OAuth1Session(
@@ -75,23 +80,29 @@ class Tweet(object):
             raise
 
 def get_request_token():
-    request_token = {
-            'oauth_token': request.values.get('oauth_token'),
-            'oauth_token_secret': request.values.get('oauth_token_secret'),
-            'oauth_verifier': request.values.get('oauth_verifier'),
-            }
+    if session.get('request_token') is not None:
+        request_token = session.get('request_token')
+    else:
+        request_token = {
+                'oauth_token': request.values.get('oauth_token'),
+                'oauth_verifier': request.values.get('oauth_verifier')}
+        if request_token['oauth_token'] is not None and request_token['oauth_verifier'] is not None:
+            session['request_token'] = request_token
     print "request_token: ", request_token
     return request_token
 
 
 def check_token():
-    request_token = get_request_token()
-    if request_token['oauth_token'] is None:
-        return False
-    elif request_token['oauth_verifier'] is None:
-        return False
-    else:
+    if session.get('access_token') is not None:
         return True
+    elif session.get('request_token') is not None:
+        return True
+    else:
+        return False
+
+def clean_session():
+    for s in ['request_token', 'access_token']:
+        session.pop(s, None)
 
 
 class TweetError(Exception):
