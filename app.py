@@ -8,6 +8,7 @@ import logging
 import json
 from datetime import timedelta
 from flask import Flask, session, request, redirect, render_template
+from flask_assets import Environment, Bundle
 from lib import tweet
 
 CONFIG_FILE = "etc/tweet.json"
@@ -15,6 +16,10 @@ CONFIG_FILE = "etc/tweet.json"
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
+assets = Environment(app)
+assets.url = app.static_url_path
+scss = Bundle('scss/style.scss', filters='pyscss', output='css/style.css')
+assets.register('style_scss', scss)
 
 @app.before_request
 def before_request():
