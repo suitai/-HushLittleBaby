@@ -28,7 +28,6 @@ def before_request():
     elif tweet.check_token():
         return
     else:
-        tweet.clean_session()
         session.permanent = True
         app.permanent_session_lifetime = timedelta(minutes=5)
         return redirect('/login')
