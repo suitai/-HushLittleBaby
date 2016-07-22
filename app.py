@@ -42,6 +42,13 @@ def login():
     return redirect(redirect_url)
 
 
+@app.route('/logout', methods=['GET'])
+def logout():
+    print "INFO: logout"
+    tweet.clean_session()
+    return redirect('/login')
+
+
 @app.route("/")
 def index():
     print "INFO: index"
