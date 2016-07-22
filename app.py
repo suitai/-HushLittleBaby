@@ -59,9 +59,9 @@ def index():
         json.dump(tweets, f)
 
     if isinstance(tweets, dict):
-        if 'error' in tweets.keys():
-            print "error: ", tweets
-            return redirect('/login')
+        if 'errors' in tweets.keys():
+            print "ERROR: ", tweets
+            return redirect('/logout')
 
     for t in tweets[:]:
         if 'extended_entities' not in t.keys():
