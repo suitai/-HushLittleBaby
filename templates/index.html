@@ -1,20 +1,29 @@
 <html>
+    <head>
+        {% assets "style_scss" %}
+        <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+        {% endassets %}
+    </head>
     <body>
-        {% for tweet in tweets %}
-        <div class tweet>
-            {% for media in tweet.extended_entities.media%}
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
-                <img src={{ media.media_url }}>
-            </a>
+        <div class="tweets">
+            {% for tweet in tweets %}
+            <div class="tweet">
+                <div class="media">
+                    <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
+                        <img src={{ tweet.extended_entities.media[0].media_url }}>
+                    </a>
+                </div>
+                <div class="user">
+                    <a href="https://twitter.com/{{ tweet.user.screen_name }}">
+                        <p class="user">{{ tweet.user.screen_name }}</p>
+                    </a>
+                </div>
+                <div class="count">
+                    <p> リツイート: {{ tweet.favorite_count }} いいね: {{ tweet.favorite_count }}</p>
+                </div>
+            </div>
             {% endfor %}
-            <p>{{ tweet.text }}</p>
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}">
-                <p>{{ tweet.user.screen_name }}</p>
-            </a>
-            <p> リツイート: {{ tweet.favorite_count }} いいね: {{ tweet.favorite_count }}</p>
         </div>
-        <hr>
-        {% endfor %}
     </body>
 </html>
 
