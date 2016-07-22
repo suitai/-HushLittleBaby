@@ -4,7 +4,7 @@
 
 import sys
 import getopt
-import tweet
+import cuitweet
 import download
 
 ### Functions
@@ -29,7 +29,7 @@ def tweet_get_favorite_media(args, optlist):
     out_dir = opt['out_dir'] if opt.has_key('out_dir') else "./"
     key_file = opt['key_file'] if opt.has_key('key_file') else ("tweet_keys.yaml")
 
-    Tw = tweet.Tweet(key_file)
+    Tw = cuitweet.Tweet(key_file)
     tweets = Tw.get_favorite(opt)
     num = len(tweets)
     first_id = tweets[0][u'id']
