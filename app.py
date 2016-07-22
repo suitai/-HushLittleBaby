@@ -37,7 +37,7 @@ def before_request():
 @app.route('/login', methods=['GET'])
 def login():
     print "INFO: login"
-    t = tweet.Tweet()
+    t = tweet.Tweet(CONFIG_FILE)
     redirect_url = t.get_redirect_url()
     return redirect(redirect_url)
 
