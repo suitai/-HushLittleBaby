@@ -92,6 +92,9 @@ def check_token():
     elif session.get('request_token') is not None:
         return True
     else:
+        request_token = get_request_token()
+        if request_token['oauth_token'] is not None and request_token['oauth_verifier'] is not None:
+            return True
         return False
 
 
