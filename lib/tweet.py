@@ -4,7 +4,7 @@
 
 import os
 import json
-from requests_oauthlib import OAuth1Session
+from requests_oauthlib import OAuth1Session, oauth1_session
 from flask import session, request
 
 
@@ -52,8 +52,10 @@ class Tweet(object):
                     verifier=request_token['oauth_verifier'])
             try:
                 access_token = oauth.fetch_access_token(self.urls['access_token'])
-            except Exception:
-                raise
+            except oauth1_session.TokenRequestDenied as detail:
+                print "ERROR: ", detail
+                raise RequestDenied(detail)
+
             if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
                 session['access_token'] = access_token
         self.keys['access_token'] = access_token['oauth_token']
@@ -69,8 +71,9 @@ class Tweet(object):
         try:
             res = oauth.get(self.urls[case], params=params)
             return json.loads(res.text)
-        except Exception:
-            raise
+        except oauth1_session.TokenRequestDenied as detail:
+            print "ERROR: ", detail
+            raise RequestDenied(detail)
 
 
 def get_request_token():
@@ -103,7 +106,7 @@ def clean_session():
         session.pop(s, None)
 
 
-class TweetError(Exception):
+class RequestDenied(Exception):
     def __init__(self, value):
         self.value = value
 
