@@ -6,7 +6,7 @@
     "access_token": "https://api.twitter.com/oauth/access_token",
     "search": "https://api.twitter.com/1.1/search/tweets.json",
     "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
-    "favorite": "https://api.twitter.com/1.1/favorites/list.json",
+    "favorites": "https://api.twitter.com/1.1/favorites/list.json",
     "lists": "https://api.twitter.com/1.1/lists/list.json",
     "list": "https://api.twitter.com/1.1/lists/statuses.json",
     "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
