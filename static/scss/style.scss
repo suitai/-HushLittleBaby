@@ -1,3 +1,8 @@
+$tweet-size: 250px;
+$img-size: 200px;
+$tweet-font-size: 12px;
+
+
 .tweets {
     display: flex;
     flex-flow: wrap;
@@ -5,31 +10,39 @@
     align-items: center;
 
     .tweet {
-        width: 256px;
-        height: 256px;
+        width: $tweet-size;
+        height: $tweet-size;
         position: relative;
 
         .media {
             text-align: center;
-        }
-        img {
-            max-width: 200px;
-            max-height: 200px;
+
+            img {
+                max-width: $img-size;
+                max-height: $img-size;
+            }
         }
         .user {
             position: absolute;
-            bottom: 7%;
+            bottom: $tweet-font-size * 2 + 1;
             right: 0;
             left: 0;
+
+            a {
+                text-align: center;
+                font-size: $tweet-font-size;
+            }
         }
         .count {
             position: absolute;
             bottom: 0;
             right: 0;
             left: 0;
-        }
-        p {
-            text-align: center;
+
+            p {
+                text-align: center;
+                font-size: $tweet-font-size;
+            }
         }
     }
 }
