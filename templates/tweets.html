@@ -6,6 +6,9 @@
                 <img src={{ tweet.extended_entities.media[0].media_url }}>
             </a>
         </div>
+        {% if 'retweeted_status' in tweet %}
+        {% set tweet = tweet.retweeted_status %}
+        {% endif %}
         <div class="user">
             <a href="https://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.screen_name }}</a>
         </div>
