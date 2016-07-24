@@ -62,8 +62,11 @@ def index():
 def _get_tweets():
     twtype = request.values.get('twtype')
     t = tweet.Tweet(CONFIG_FILE)
-    t.set_access_token()
-    tweets = t.get_tweets("timeline", {'count': 100})
+    try:
+        t.set_access_token()
+        tweets = t.get_tweets(twtype, {'count': 200})
+    except tweet.RequestDenied:
+        return redirect('/logout')
 
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
