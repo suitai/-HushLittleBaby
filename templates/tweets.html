@@ -2,7 +2,7 @@
     {% for tweet in tweets %}
     <div class="tweet" id={{ tweet.id }}>
         <div class="media">
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
+            <a href="{{ tweet.extended_entities.media[0].expanded_url }}">
                 <img src={{ tweet.extended_entities.media[0].media_url }}>
             </a>
         </div>
