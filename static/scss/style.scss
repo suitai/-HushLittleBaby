@@ -22,6 +22,7 @@ $tweet-font-size: 12px;
             }
         }
         .user {
+            z-index: 1;
             position: absolute;
             bottom: $tweet-font-size * 2 + 1;
             right: 0;
