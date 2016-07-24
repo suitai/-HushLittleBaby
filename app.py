@@ -53,12 +53,18 @@ def logout():
     return redirect('/login')
 
 
-@app.route("/")
+@app.route('/', methods=['GET'])
 def index():
     print "INFO: index"
+    return render_template('index.html')
+
+@app.route('/_get_tweets')
+def _get_tweets():
+    twtype = request.values.get('twtype')
     t = tweet.Tweet(CONFIG_FILE)
     t.set_access_token()
     tweets = t.get_tweets("timeline", {'count': 100})
+
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
 
@@ -70,7 +76,8 @@ def index():
     for t in tweets[:]:
         if 'extended_entities' not in t.keys():
             tweets.remove(t)
-    return render_template('index.html', tweets=tweets)
+
+    return render_template('tweets.html', tweets=tweets)
 
 
 if __name__ == "__main__":

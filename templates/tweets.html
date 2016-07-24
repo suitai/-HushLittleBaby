@@ -1,0 +1,17 @@
+<div class="tweets">
+    {% for tweet in tweets %}
+    <div class="tweet" id={{ tweet.id }}>
+        <div class="media">
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
+                <img src={{ tweet.extended_entities.media[0].media_url }}>
+            </a>
+        </div>
+        <div class="user">
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.screen_name }}</a>
+        </div>
+        <div class="count">
+            <p> ⇄ {{ tweet.favorite_count }} ❤ {{ tweet.favorite_count }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
