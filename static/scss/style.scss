@@ -22,6 +22,7 @@ $tweet-font-size: 12px;
             }
         }
         .user {
+            text-align: center;
             z-index: 1;
             position: absolute;
             bottom: $tweet-font-size * 2 + 1;
@@ -29,18 +30,17 @@ $tweet-font-size: 12px;
             left: 0;
 
             a {
-                text-align: center;
                 font-size: $tweet-font-size;
             }
         }
         .count {
+            text-align: center;
             position: absolute;
             bottom: 0;
             right: 0;
             left: 0;
 
             p {
-                text-align: center;
                 font-size: $tweet-font-size;
             }
         }
