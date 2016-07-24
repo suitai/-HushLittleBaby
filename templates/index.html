@@ -1,28 +1,19 @@
 <html>
     <head>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
         {% assets "style_scss" %}
         <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
         {% endassets %}
     </head>
     <body>
-        <div class="tweets">
-            {% for tweet in tweets %}
-            <div class="tweet">
-                <div class="media">
-                    <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}">
-                        <img src={{ tweet.extended_entities.media[0].media_url }}>
-                    </a>
-                </div>
-                <div class="user">
-                    <a href="https://twitter.com/{{ tweet.user.screen_name }}">
-                        <p class="user">{{ tweet.user.screen_name }}</p>
-                    </a>
-                </div>
-                <div class="count">
-                    <p> リツイート: {{ tweet.favorite_count }} いいね: {{ tweet.favorite_count }}</p>
-                </div>
-            </div>
-            {% endfor %}
+        <div class="menu">
+            <label class="button">
+                <input type="radio" id="item-radio" name="twtype" value="timeline" autocomplete="off">timeline
+                <input type="radio" id="item-radio" name="twtype" value="favorites" autocomplete="off">favorites
+            </label>
+        </div>
+        <div class="content">
         </div>
     </body>
 </html>
