@@ -58,15 +58,18 @@ def index():
     print "INFO: index"
     return render_template('index.html')
 
-@app.route('/_get_tweets')
+
+@app.route('/_get_tweets', methods=['POST'])
 def _get_tweets():
-    twtype = request.values.get('twtype')
+    print "INFO: _get_tweets"
+    print "request:", request.json
     t = tweet.Tweet(CONFIG_FILE)
     try:
         t.set_access_token()
-        tweets = t.get_tweets(twtype, {'count': 200})
-    except tweet.RequestDenied:
-        return redirect('/logout')
+        tweets = t.get_tweets(request.json['twtype'], request.json['params'])
+    except tweet.RequestDenied, detail:
+        print "ERROR:", detail
+        return render_template('error.html', message=detail)
 
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
