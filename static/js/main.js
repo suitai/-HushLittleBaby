@@ -1,4 +1,10 @@
 $(function() {
+    $('#timeline-radio').attr('checked', true);
+    show_tweets({
+        twtype: $(":input[name='twtype']:checked").val(),
+        params: {count: 200}
+    });
+
     $("input[name='twtype']").change(function() {
         show_tweets({
             twtype: $(":input[name='twtype']:checked").val(),
