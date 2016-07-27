@@ -77,7 +77,7 @@ def _get_tweets():
     if isinstance(tweets, dict):
         if 'errors' in tweets.keys():
             print "ERROR: ", tweets
-            return redirect('/logout')
+            return render_template('error.html', message=tweets['errors'][0]['message'])
         elif 'statuses' in tweets.keys():
             tweets = tweets['statuses']
 
