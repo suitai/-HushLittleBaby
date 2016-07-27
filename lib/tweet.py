@@ -53,14 +53,14 @@ class Tweet(object):
             try:
                 access_token = oauth.fetch_access_token(self.urls['access_token'])
             except oauth1_session.TokenRequestDenied as detail:
-                print "ERROR: ", detail
+                print "ERROR:", detail
                 raise RequestDenied(detail)
 
             if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
                 session['access_token'] = access_token
         self.keys['access_token'] = access_token['oauth_token']
         self.keys['access_token_secret'] = access_token['oauth_token_secret']
-        print "access_token: ", access_token
+        print "access_token:", access_token
 
     def get_tweets(self, case, params={}):
         oauth = OAuth1Session(
@@ -72,7 +72,7 @@ class Tweet(object):
             res = oauth.get(self.urls[case], params=params)
             return json.loads(res.text)
         except oauth1_session.TokenRequestDenied as detail:
-            print "ERROR: ", detail
+            print "ERROR:", detail
             raise RequestDenied(detail)
 
 
@@ -85,7 +85,7 @@ def get_request_token():
                 'oauth_verifier': request.values.get('oauth_verifier')}
         if request_token['oauth_token'] is not None and request_token['oauth_verifier'] is not None:
             session['request_token'] = request_token
-    print "request_token: ", request_token
+    print "request_token:", request_token
     return request_token
 
 
