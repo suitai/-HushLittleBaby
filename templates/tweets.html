@@ -2,15 +2,15 @@
     {% for tweet in tweets %}
     <div class="tweet" id={{ tweet.id }}>
         <div class="media">
-            <a href="{{ tweet.extended_entities.media[0].expanded_url }}">
-                <img src={{ tweet.extended_entities.media[0].media_url }}>
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}" target="_blank">
+                <img src={{ tweet.entities.media[0].media_url }}>
             </a>
         </div>
         {% if 'retweeted_status' in tweet %}
         {% set tweet = tweet.retweeted_status %}
         {% endif %}
         <div class="user">
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}">{{ tweet.user.name }}</a>
+            <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
         </div>
         <div class="count">
             <p> ⇄ {{ tweet.retweet_count }} ❤ {{ tweet.favorite_count }}</p>

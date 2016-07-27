@@ -77,9 +77,10 @@ def _get_tweets():
             return redirect('/logout')
 
     for t in tweets[:]:
-        if 'extended_entities' not in t.keys():
+        if 'media' not in t['entities'].keys():
             tweets.remove(t)
 
+    print "tweets_num:", len(tweets)
     return render_template('tweets.html', tweets=tweets)
 
 
