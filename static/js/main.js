@@ -5,6 +5,8 @@ $(function() {
         params: {count: 200}
     });
 
+    $("#search-text").val("");
+
     $("input[name='twtype']").change(function() {
         show_tweets({
             twtype: $(":input[name='twtype']:checked").val(),
@@ -12,6 +14,17 @@ $(function() {
         });
     });
 
+    $("form[name='search']").submit(function(event) {
+        event.preventDefault();
+        $('#timeline-radio').prop('checked', false);
+        $('#favorites-radio').prop('checked', false);
+        show_tweets({
+            twtype: "search",
+            params: {
+                q: $(":text[name='search']").val(),
+                result_type: "recent",
+                count: 100
+            }
         });
     });
 });

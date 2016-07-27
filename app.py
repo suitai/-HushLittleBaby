@@ -78,6 +78,8 @@ def _get_tweets():
         if 'errors' in tweets.keys():
             print "ERROR: ", tweets
             return redirect('/logout')
+        elif 'statuses' in tweets.keys():
+            tweets = tweets['statuses']
 
     for t in tweets[:]:
         if 'media' not in t['entities'].keys():
