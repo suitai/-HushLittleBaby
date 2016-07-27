@@ -26,6 +26,8 @@ def before_request():
     print "INFO: before_request"
     if request.path == '/login':
         return
+    elif request.path == '/logout':
+        return
     elif request.path[-4:] == ".css":
         return
     elif request.path[-3:] == ".js":
