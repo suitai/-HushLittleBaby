@@ -1,29 +1,30 @@
 $(function() {
-    $('#timeline-radio').attr('checked', true);
-    show_tweets({
-        twtype: $(":input[name='twtype']:checked").val(),
-        params: {count: 200}
-    });
+    show_twtype("timeline");
 
     $("#search-text").val("");
 
-    $("input[name='twtype']").change(function() {
-        show_tweets({
-            twtype: $(":input[name='twtype']:checked").val(),
-            params: {count: 100}
-        });
+    $("button.timeline").on('click', function() {
+        show_twtype("timeline");
     });
-
+    $("button.favorites").on('click', function() {
+        show_twtype("favorites");
+    });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
-        $('#timeline-radio').prop('checked', false);
-        $('#favorites-radio').prop('checked', false);
         show_search($(":text[name='search']").val());
     });
 });
 
+function show_twtype(twtype) {
+    disable_button(true);
+    show_tweets({
+        twtype: twtype,
+        params: {count: 100}
+    });
+    disable_button(false);
+}
+
 function show_search(query) {
-    $('.content').html("");
     disable_button(true);
     show_tweets({
         twtype: "search",
@@ -38,6 +39,12 @@ function show_search(query) {
     });
     disable_button(false);
 }
+
+function disable_button(status) {
+    $("#timeline-button").prop('disabled', status);
+    $("#favorites-button").prop('disabled', status);
+}
+
 function show_tweets(data){
     console.log("show_tweets");
     console.log(data);
