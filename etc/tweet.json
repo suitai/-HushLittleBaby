@@ -1,5 +1,5 @@
 {
-  "urls": {
+  "get_urls": {
     "oath2_token": "https://api.twitter.com/oauth2/token",
     "request_token": "https://api.twitter.com/oauth/request_token",
     "authenticate": "https://api.twitter.com/oauth/authenticate",
@@ -7,13 +7,15 @@
     "search": "https://api.twitter.com/1.1/search/tweets.json",
     "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
     "favorites": "https://api.twitter.com/1.1/favorites/list.json",
-    "favorite-create": "https://api.twitter.com/1.1/favorites/create.json",
-    "favorite-destroy": "https://api.twitter.com/1.1/favorites/destroy.json",
     "lists": "https://api.twitter.com/1.1/lists/list.json",
     "list_status": "https://api.twitter.com/1.1/lists/statuses.json",
     "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
     "trends": "https://api.twitter.com/1.1/trends/place.json"
   },
+  "post_urls" {
+    "favorite-create": "https://api.twitter.com/1.1/favorites/create.json",
+    "favorite-destroy": "https://api.twitter.com/1.1/favorites/destroy.json",
+  }
   "woeids": {
     "Japan": 23424856,
     "Tokyo": 1118370,

@@ -19,7 +19,8 @@ class Tweet(object):
     def load_config(self, filename):
         with open(filename, 'r') as f:
             config = json.load(f)
-        self.urls = config['urls']
+        self.get_urls = config['get_urls']
+        self.post_urls = config['post_urls']
         self.woeids = config['woeids']
         print "INFO: load_config"
 
@@ -35,8 +36,8 @@ class Tweet(object):
                 client_secret=self.keys['consumer_secret'],
                 callback_uri=self.keys['callback_url'])
         try:
-            oauth.fetch_request_token(self.urls['request_token'])
-            return oauth.authorization_url(self.urls['authenticate'])
+            oauth.fetch_request_token(self.get_urls['request_token'])
+            return oauth.authorization_url(self.get_urls['authenticate'])
         except oauth1_session.TokenRequestDenied as detail:
             raise RequestDenied(detail)
 
@@ -51,7 +52,7 @@ class Tweet(object):
                     resource_owner_key=request_token['oauth_token'],
                     verifier=request_token['oauth_verifier'])
             try:
-                access_token = oauth.fetch_access_token(self.urls['access_token'])
+                access_token = oauth.fetch_access_token(self.get_urls['access_token'])
             except oauth1_session.TokenRequestDenied as detail:
                 raise RequestDenied(detail)
 
@@ -69,7 +70,7 @@ class Tweet(object):
                 resource_owner_key=self.keys['access_token'],
                 resource_owner_secret=self.keys['access_token_secret'])
         try:
-            res = oauth.get(self.urls[case], params=params)
+            res = oauth.get(self.get_urls[case], params=params)
             return json.loads(res.text)
         except oauth1_session.TokenRequestDenied as detail:
             print detail
@@ -82,7 +83,7 @@ class Tweet(object):
                 resource_owner_key=self.keys['access_token'],
                 resource_owner_secret=self.keys['access_token_secret'])
         try:
-            res = oauth.post(self.urls[case], params=params)
+            res = oauth.post(self.post_urls[case], params=params)
             return json.loads(res.text)
         except oauth1_session.TokenRequestDenied as detail:
             print detail
