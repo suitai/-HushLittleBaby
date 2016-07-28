@@ -37,8 +37,8 @@ class Tweet(object):
         try:
             oauth.fetch_request_token(self.urls['request_token'])
             return oauth.authorization_url(self.urls['authenticate'])
-        except Exception:
-            raise
+        except oauth1_session.TokenRequestDenied as detail:
+            raise RequestDenied(detail)
 
     def set_access_token(self):
         if session.get('access_token') is not None:
