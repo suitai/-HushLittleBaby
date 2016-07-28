@@ -1,4 +1,7 @@
 $(function() {
+
+    set_lists();
+
     show_twtype("timeline");
 
     $("#search-text").val("");
@@ -8,6 +11,9 @@ $(function() {
     });
     $("button.favorites").on('click', function() {
         show_twtype("favorites");
+    });
+    $("select.lists").change(function() {
+        show_lists($("select.lists option:selected").val());
     });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
@@ -20,6 +26,18 @@ function show_twtype(twtype) {
     show_tweets({
         twtype: twtype,
         params: {count: 100}
+    });
+    disable_button(false);
+}
+
+function show_lists(list_id) {
+    disable_button(true);
+    show_tweets({
+        twtype: "list_status",
+        params: {
+            list_id: list_id,
+            count: 100
+        }
     });
     disable_button(false);
 }
@@ -60,12 +78,29 @@ function show_tweets(data){
     });
 }
 
+function set_lists(){
+    get_lists().done(function(result) {
+        $("select[name='lists']").append(result);
+        console.log("get_lists")
+    }).fail(function(result) {
+        console.log(result);
+    });
+}
+
 function get_tweets(data){
     return $.ajax({
         url: '_get_tweets',
         type: 'post',
         data: JSON.stringify(data),
         contentType: 'application/json',
+        dataType: 'html',
+    });
+}
+
+function get_lists(){
+    return $.ajax({
+        url: '_get_lists',
+        type: 'get',
         dataType: 'html',
     });
 }

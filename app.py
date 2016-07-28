@@ -91,6 +91,19 @@ def _get_tweets():
     print "tweets_num:", len(tweets)
     return render_template('tweets.html', tweets=tweets)
 
+@app.route('/_get_lists', methods=['GET'])
+def _get_lists():
+    print "INFO: _get_lists"
+    t = tweet.Tweet(CONFIG_FILE)
+    try:
+        t.set_access_token()
+        lists = t.get_tweets("lists", {})
+    except tweet.RequestDenied as detail:
+        print "ERROR:", detail
+        return redirect('/logout')
+
+    print "lists_num:", len(lists)
+    return render_template('lists.html', lists=lists)
 
 if __name__ == "__main__":
     app.debug = True
