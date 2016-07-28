@@ -3,7 +3,7 @@
     <div class="tweet" id={{ tweet.id }}>
         <div class="media">
             <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}" target="_blank">
-                <img src={{ tweet.entities.media[0].media_url }}>
+                <img src={{ tweet.entities.media[0].media_url_https }}>
             </a>
         </div>
         {% if 'retweeted_status' in tweet %}
