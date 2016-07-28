@@ -1,6 +1,6 @@
 $(function() {
 
-    set_lists();
+    write_lists();
 
     show_twtype("timeline");
 
@@ -13,7 +13,7 @@ $(function() {
         show_twtype("favorites");
     });
     $("select.lists").change(function() {
-        show_lists($("select.lists option:selected").val());
+        show_list($("select.lists option:selected").val());
     });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
@@ -23,16 +23,16 @@ $(function() {
 
 function show_twtype(twtype) {
     disable_button(true);
-    show_tweets({
+    write_tweets({
         twtype: twtype,
         params: {count: 100}
     });
     disable_button(false);
 }
 
-function show_lists(list_id) {
+function show_list(list_id) {
     disable_button(true);
-    show_tweets({
+    write_tweets({
         twtype: "list_status",
         params: {
             list_id: list_id,
@@ -44,7 +44,7 @@ function show_lists(list_id) {
 
 function show_search(query) {
     disable_button(true);
-    show_tweets({
+    write_tweets({
         twtype: "search",
         params: {
             q: query,
@@ -60,7 +60,7 @@ function disable_button(status) {
     $("#favorites-button").prop('disabled', status);
 }
 
-function show_tweets(data){
+function write_tweets(data){
     console.log("show_tweets");
     console.log(data);
     $('.content').html("");
@@ -75,7 +75,7 @@ function show_tweets(data){
     });
 }
 
-function set_lists(){
+function write_lists(){
     get_lists().done(function(result) {
         $("select[name='lists']").append(result);
         console.log("get_lists")
