@@ -69,9 +69,10 @@ def _get_tweets():
     try:
         t.set_access_token()
         tweets = t.get_tweets(request.json['twtype'], request.json['params'])
-    except tweet.RequestDenied, detail:
+    except tweet.RequestDenied as detail:
         print "ERROR:", detail
-        return render_template('error.html', message=detail)
+        #return render_template('error.html', message=detail)
+        return redirect('/logout')
 
     with open("timeline.json", 'w') as f:
         json.dump(tweets, f)
