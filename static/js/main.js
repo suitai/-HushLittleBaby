@@ -122,3 +122,14 @@ function get_lists(){
         dataType: 'html',
     });
 }
+
+function post_tweets(data){
+    console.log("post_tweets")
+    return $.ajax({
+        url: '_post_tweets',
+        type: 'post',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'text',
+    });
+}
