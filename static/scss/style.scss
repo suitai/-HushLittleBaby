@@ -52,6 +52,7 @@ $default-color: #666666;
             left: 0;
 
             span {
+                cursor: pointer;
                 font-size: $tweet-font-size;
             }
             span[data-retweeted="True"] {

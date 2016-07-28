@@ -20,6 +20,33 @@ $(function() {
         show_search($(":text[name='search']").val());
     });
 
+    $(document).on('click', "span.retweet-count" , function() {
+        if ($(this).attr("data-retweeted") == "False")  {
+            if (change_tweet("retweet", $(this).attr("data-id"))) {
+                $(this).attr("data-retweeted", "True");
+                $(this).css('color', "#00cc00");
+            }
+        } else if ($(this).attr("data-retweeted") == "True")  {
+            if (change_tweet("unretweet", $(this).attr("data-id"))) {
+                $(this).attr("data-retweeted", "False");
+                $(this).css('color', "#666666");
+            }
+        }
+    });
+    $(document).on('click', "span.favorite-count" , function() {
+        if ($(this).attr("data-favorited") == "False")  {
+            if (change_tweet("favorite-create", $(this).attr("data-id"))) {
+                $(this).attr("data-favorited", "True");
+                $(this).css('color', "#ff0000");
+            }
+        } else if ($(this).attr("data-favorited") == "True")  {
+            if (change_tweet("favorite-destroy", $(this).attr("data-id"))) {
+                $(this).attr("data-favorited", "False");
+                $(this).css('color', "#666666");
+            }
+        }
+    });
+
     $(document).on('mouseover',"span.retweet-count", function() {
         if ($(this).attr("data-retweeted") == "False")  {
             $(this).css('color', "#00cc00");
@@ -74,6 +101,27 @@ function show_search(query) {
         }
     });
     disable_button(false);
+}
+
+function change_tweet(twtype, id) {
+    var data = {
+        twtype: twtype,
+        params: {id: id}
+    };
+    console.log("change_tweets");
+    console.log(data);
+    return post_tweets(data).done(function(result) {
+        console.log(result);
+        if (result == "success") {
+            return true;
+        } else {
+            return false;
+        }
+    }).fail(function(result) {
+        console.log("error");
+        console.log(result);
+        return false;
+    });
 }
 
 function disable_button(status) {
