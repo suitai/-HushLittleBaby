@@ -131,6 +131,7 @@ def _get_lists():
     print "lists_num:", len(lists)
     return render_template('lists.html', lists=lists)
 
+
 if __name__ == "__main__":
     app.debug = True
     app.logger.addHandler(logging.StreamHandler(sys.stdout))
