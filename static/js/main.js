@@ -18,17 +18,26 @@ $(function() {
         event.preventDefault();
         $('#timeline-radio').prop('checked', false);
         $('#favorites-radio').prop('checked', false);
-        show_tweets({
-            twtype: "search",
-            params: {
-                q: $(":text[name='search']").val(),
-                result_type: "recent",
-                count: 100
-            }
-        });
+        show_search($(":text[name='search']").val());
     });
 });
 
+function show_search(query) {
+    $('.content').html("");
+    disable_button(true);
+    show_tweets({
+        twtype: "search",
+        params: {
+            q: query,
+            result_type: "recent",
+            count: 100
+        },
+        options: {
+            retweeted: false
+        }
+    });
+    disable_button(false);
+}
 function show_tweets(data){
     console.log("show_tweets");
     console.log(data);
