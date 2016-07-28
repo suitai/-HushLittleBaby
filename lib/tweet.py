@@ -77,13 +77,18 @@ class Tweet(object):
             raise RequestDenied(detail)
 
     def post_tweets(self, case, params={}):
+        if case in ['retweet', 'unretweet']:
+            url = self.post_urls[case] + params['id'] + ".json"
+        else:
+            url = self.post_urls[case]
+
         oauth = OAuth1Session(
                 self.keys['consumer_key'],
                 client_secret=self.keys['consumer_secret'],
                 resource_owner_key=self.keys['access_token'],
                 resource_owner_secret=self.keys['access_token_secret'])
         try:
-            res = oauth.post(self.post_urls[case], params=params)
+            res = oauth.post(url, params=params)
             return json.loads(res.text)
         except oauth1_session.TokenRequestDenied as detail:
             print detail
