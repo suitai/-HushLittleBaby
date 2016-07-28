@@ -91,6 +91,29 @@ def _get_tweets():
     print "tweets_num:", len(tweets)
     return render_template('tweets.html', tweets=tweets)
 
+
+@app.route('/_post_tweets', methods=['POST'])
+def _post_tweets():
+    print "INFO: _post_tweets"
+    print "request:", request.json
+    t = tweet.Tweet(CONFIG_FILE)
+    try:
+        t.set_access_token()
+        tweets = t.post_tweets(request.json['twtype'], request.json['params'])
+    except tweet.RequestDenied as detail:
+        print "ERROR:", detail
+        return redirect('/logout')
+
+    with open("timeline.json", 'w') as f:
+        json.dump(tweets, f)
+
+    if 'error' in tweets.keys():
+        print "ERROR: ", tweets
+        return tweets['error']
+    else:
+        return "success"
+
+
 @app.route('/_get_lists', methods=['GET'])
 def _get_lists():
     print "INFO: _get_lists"
