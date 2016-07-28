@@ -50,9 +50,6 @@ function show_search(query) {
             q: query,
             result_type: "recent",
             count: 100
-        },
-        options: {
-            retweeted: false
         }
     });
     disable_button(false);
