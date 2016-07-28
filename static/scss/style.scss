@@ -2,6 +2,9 @@ $tweet-size: 250px;
 $img-size: 200px;
 $tweet-font-size: 12px;
 $menu-color: #00ccff;
+$retweet-color: #00cc00;
+$favorite-color: #ff0000;
+$default-color: #666666;
 
 .menu {
     background-color: $menu-color;
@@ -50,6 +53,18 @@ $menu-color: #00ccff;
 
             span {
                 font-size: $tweet-font-size;
+            }
+            span[data-retweeted="True"] {
+                color: $retweet-color;
+            }
+            span[data-retweeted="False"] {
+                color: $default-color;
+            }
+            span[data-favorited="True"] {
+                color: $favorite-color;
+            }
+            span[data-favorited="False"] {
+                color: $default-color;
             }
         }
     }

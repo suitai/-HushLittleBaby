@@ -13,8 +13,8 @@
             <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
         </div>
         <div class="count">
-            <span class=retweet-count>⇄ {{ tweet.retweet_count }}</span>
-            <span class=favorite-count>❤ {{ tweet.favorite_count }}</span>
+            <span class=retweet-count data-id={{ tweet.id }} data-retweeted={{ tweet.retweeted }}>⇄ {{ tweet.retweet_count }}</span>
+            <span class=favorite-count data-id={{ tweet.id }} data-favorited={{ tweet.favorited }}>❤ {{ tweet.favorite_count }}</span>
         </div>
     </div>
     {% endfor %}
