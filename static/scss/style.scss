@@ -33,7 +33,7 @@ $menu-color: #00ccff;
             text-align: center;
             z-index: 1;
             position: absolute;
-            bottom: $tweet-font-size * 2 + 1;
+            bottom: $tweet-font-size * 2;
             right: 0;
             left: 0;
 
@@ -48,7 +48,7 @@ $menu-color: #00ccff;
             right: 0;
             left: 0;
 
-            p {
+            span {
                 font-size: $tweet-font-size;
             }
         }
