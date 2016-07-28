@@ -12,12 +12,12 @@
     "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
     "trends": "https://api.twitter.com/1.1/trends/place.json"
   },
-  "post_urls" {
+  "post_urls": {
     "favorite-create": "https://api.twitter.com/1.1/favorites/create.json",
     "favorite-destroy": "https://api.twitter.com/1.1/favorites/destroy.json",
     "retweet": "https://api.twitter.com/1.1/statuses/retweet/:id.json",
     "unretweet": "https://api.twitter.com/1.1/statuses/unretweet/:id.json"
-  }
+  },
   "woeids": {
     "Japan": 23424856,
     "Tokyo": 1118370,

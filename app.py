@@ -110,6 +110,9 @@ def _post_tweets():
     if 'error' in tweets.keys():
         print "ERROR: ", tweets
         return tweets['error']
+    elif 'errors' in tweets.keys():
+        print "ERROR: ", tweets
+        return tweets['errors'][0]['message']
     else:
         return "success"
 
