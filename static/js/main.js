@@ -19,6 +19,27 @@ $(function() {
         event.preventDefault();
         show_search($(":text[name='search']").val());
     });
+
+    $(document).on('mouseover',"span.retweet-count", function() {
+        if ($(this).attr("data-retweeted") == "False")  {
+            $(this).css('color', "#00cc00");
+        }
+    });
+    $(document).on('mouseout',"span.retweet-count", function() {
+        if ($(this).attr("data-retweeted") == "False")  {
+            $(this).css('color', "#666666");
+        }
+    });
+    $(document).on('mouseover',"span.favorite-count", function() {
+        if ($(this).attr("data-favorited") == "False")  {
+            $(this).css('color', "#ff0000");
+        }
+    });
+    $(document).on('mouseout',"span.favorite-count" ,function() {
+        if ($(this).attr("data-favorited") == "False")  {
+            $(this).css('color', "#666666");
+        }
+    });
 });
 
 function show_twtype(twtype) {
