@@ -88,7 +88,6 @@ function write_tweets(data){
 
     get_tweets(data).done(function(result) {
         $('.content').html(result);
-        console.log("get_tweets")
     }).fail(function(result) {
         $('.content').html("<p>" + result.statusText + "</p>");
         console.log("error");
@@ -99,13 +98,13 @@ function write_tweets(data){
 function write_lists(){
     get_lists().done(function(result) {
         $("select[name='lists']").append(result);
-        console.log("get_lists")
     }).fail(function(result) {
         console.log(result);
     });
 }
 
 function get_tweets(data){
+    console.log("get_tweets")
     return $.ajax({
         url: '_get_tweets',
         type: 'post',
@@ -116,6 +115,7 @@ function get_tweets(data){
 }
 
 function get_lists(){
+    console.log("get_lists")
     return $.ajax({
         url: '_get_lists',
         type: 'get',
