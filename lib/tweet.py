@@ -75,6 +75,19 @@ class Tweet(object):
             print detail
             raise RequestDenied(detail)
 
+    def post_tweets(self, case, params={}):
+        oauth = OAuth1Session(
+                self.keys['consumer_key'],
+                client_secret=self.keys['consumer_secret'],
+                resource_owner_key=self.keys['access_token'],
+                resource_owner_secret=self.keys['access_token_secret'])
+        try:
+            res = oauth.post(self.urls[case], params=params)
+            return json.loads(res.text)
+        except oauth1_session.TokenRequestDenied as detail:
+            print detail
+            raise RequestDenied(detail)
+
 
 def get_request_token():
     if session.get('request_token') is not None:
