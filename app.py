@@ -21,6 +21,7 @@ assets.url = app.static_url_path
 scss = Bundle('scss/style.scss', filters='pyscss', output='css/style.css')
 assets.register('style_scss', scss)
 
+
 @app.before_request
 def before_request():
     print "INFO: before_request"
@@ -43,8 +44,7 @@ def before_request():
 @app.route('/login', methods=['GET'])
 def login():
     print "INFO: login"
-    t = tweet.Tweet(CONFIG_FILE)
-    redirect_url = t.get_redirect_url()
+    redirect_url = tweet.get_redirect_url()
     return redirect(redirect_url)
 
 
@@ -65,71 +65,71 @@ def index():
 def _get_tweets():
     print "INFO: _get_tweets"
     print "request:", request.json
-    t = tweet.Tweet(CONFIG_FILE)
-    try:
-        t.set_access_token()
-        tweets = t.get_tweets(request.json['twtype'], request.json['params'])
-    except tweet.RequestDenied as detail:
-        print "ERROR:", detail
-        #return render_template('error.html', message=detail)
+
+    tweets = get_tweets(request.json['twtype'], request.json['params'])
+    if tweets is None:
         return redirect('/logout')
 
-    with open("timeline.json", 'w') as f:
-        json.dump(tweets, f)
-
-    if isinstance(tweets, dict):
-        if 'errors' in tweets.keys():
-            print "ERROR: ", tweets
-            return render_template('error.html', message=tweets['errors'][0]['message'])
-        elif 'statuses' in tweets.keys():
-            tweets = tweets['statuses']
-
-    for t in tweets[:]:
-        if 'media' not in t['entities'].keys():
-            tweets.remove(t)
+    rtn = check_tweets(tweets)
+    if rtn is not None:
+        return render_template('error.html', message=rtn)
 
     print "tweets_num:", len(tweets)
-    return render_template('tweets.html', tweets=tweets)
+    return render_tweets(request.json['twtype'], tweets)
 
 
 @app.route('/_post_tweets', methods=['POST'])
 def _post_tweets():
     print "INFO: _post_tweets"
     print "request:", request.json
-    t = tweet.Tweet(CONFIG_FILE)
-    try:
-        t.set_access_token()
-        tweets = t.post_tweets(request.json['twtype'], request.json['params'])
-    except tweet.RequestDenied as detail:
-        print "ERROR:", detail
+
+    tweets = get_tweets(request.json['twtype'], request.json['params'])
+    if tweets is None:
         return redirect('/logout')
 
-    with open("timeline.json", 'w') as f:
-        json.dump(tweets, f)
-
-    if 'error' in tweets.keys():
-        print "ERROR: ", tweets
-        return tweets['error']
-    elif 'errors' in tweets.keys():
-        print "ERROR: ", tweets
-        return tweets['errors'][0]['message']
+    rtn = check_tweets(tweets)
+    if rtn is not None:
+        return rtn
     else:
         return "success"
 
 
-@app.route('/_get_lists', methods=['GET'])
-def _get_lists():
-    print "INFO: _get_lists"
-    t = tweet.Tweet(CONFIG_FILE)
+def get_tweets(twtype, params):
+    t = tweet.Tweet()
     try:
-        t.set_access_token()
-        lists = t.get_tweets("lists", {})
+        tweets = t.get_tweets(twtype, params)
     except tweet.RequestDenied as detail:
         print "ERROR:", detail
-        return redirect('/logout')
+        return None
 
-    print "lists_num:", len(lists)
-    return render_template('lists.html', lists=lists)
+    with open("timeline.json", 'w') as f:
+        json.dump(tweets, f)
+
+    return tweets
+
+
+def check_tweets(tweets):
+    if isinstance(tweets, dict):
+        if 'error' in tweets.keys():
+            print "ERROR: ", tweets
+            return tweets['error']
+        elif 'errors' in tweets.keys():
+            print "ERROR: ", tweets
+            return tweets['errors'][0]['message']
+    return None
+
+
+def render_tweets(twtype, tweets):
+    if twtype in ["lists"]:
+        return render_template('lists.html', lists=tweets)
+
+    elif twtype in ["search"]:
+        if 'statuses' in tweets.keys():
+            tweets = tweets['statuses']
+        return render_template('tweets.html', **locals())
+
+    else:
+        return render_template('tweets.html', **locals())
 
 
 if __name__ == "__main__":

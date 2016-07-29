@@ -21,26 +21,28 @@ $(function() {
     });
 
     $(document).on('click', "span.retweet-count" , function() {
+        var tweet_id = $(this).parent().parent().attr('id');
         if ($(this).attr("data-retweeted") == "False")  {
-            if (change_tweet("retweet", $(this).attr("data-id"))) {
+            if (change_status("retweet", tweet_id)) {
                 $(this).attr("data-retweeted", "True");
                 $(this).css('color', "#00cc00");
             }
         } else if ($(this).attr("data-retweeted") == "True")  {
-            if (change_tweet("unretweet", $(this).attr("data-id"))) {
+            if (change_status("unretweet", tweet_id)) {
                 $(this).attr("data-retweeted", "False");
                 $(this).css('color', "#666666");
             }
         }
     });
     $(document).on('click', "span.favorite-count" , function() {
+        var tweet_id = $(this).parent().parent().attr('id');
         if ($(this).attr("data-favorited") == "False")  {
-            if (change_tweet("favorite-create", $(this).attr("data-id"))) {
+            if (change_status("favorite-create", tweet_id)) {
                 $(this).attr("data-favorited", "True");
                 $(this).css('color', "#ff0000");
             }
         } else if ($(this).attr("data-favorited") == "True")  {
-            if (change_tweet("favorite-destroy", $(this).attr("data-id"))) {
+            if (change_status("favorite-destroy", tweet_id)) {
                 $(this).attr("data-favorited", "False");
                 $(this).css('color', "#666666");
             }
@@ -70,16 +72,13 @@ $(function() {
 });
 
 function show_twtype(twtype) {
-    disable_button(true);
     write_tweets({
         twtype: twtype,
         params: {count: 100}
     });
-    disable_button(false);
 }
 
 function show_list(list_id) {
-    disable_button(true);
     write_tweets({
         twtype: "list_status",
         params: {
@@ -87,11 +86,9 @@ function show_list(list_id) {
             count: 100
         }
     });
-    disable_button(false);
 }
 
 function show_search(query) {
-    disable_button(true);
     write_tweets({
         twtype: "search",
         params: {
@@ -100,16 +97,21 @@ function show_search(query) {
             count: 100
         }
     });
-    disable_button(false);
 }
 
-function change_tweet(twtype, id) {
-    var data = {
+function change_status(twtype, id) {
+    return request_post({
         twtype: twtype,
         params: {id: id}
-    };
-    console.log("change_tweets");
-    console.log(data);
+    });
+}
+
+function disable_button(status) {
+    $("#timeline-button").prop('disabled', status);
+    $("#favorites-button").prop('disabled', status);
+}
+
+function request_post(data) {
     return post_tweets(data).done(function(result) {
         console.log(result);
         if (result == "success") {
@@ -124,16 +126,9 @@ function change_tweet(twtype, id) {
     });
 }
 
-function disable_button(status) {
-    $("#timeline-button").prop('disabled', status);
-    $("#favorites-button").prop('disabled', status);
-}
-
-function write_tweets(data){
-    console.log("show_tweets");
-    console.log(data);
+function write_tweets(data) {
+    disable_button(true);
     $('.content').html("");
-
     get_tweets(data).done(function(result) {
         $('.content').html(result);
     }).fail(function(result) {
@@ -141,10 +136,15 @@ function write_tweets(data){
         console.log("error");
         console.log(result);
     });
+    disable_button(false);
 }
 
 function write_lists(){
-    get_lists().done(function(result) {
+    data = {
+        twtype: "lists",
+        params: {}
+    }
+    get_tweets(data).done(function(result) {
         $("select[name='lists']").append(result);
     }).fail(function(result) {
         console.log(result);
@@ -153,6 +153,7 @@ function write_lists(){
 
 function get_tweets(data){
     console.log("get_tweets")
+    console.log(data);
     return $.ajax({
         url: '_get_tweets',
         type: 'post',
@@ -162,17 +163,9 @@ function get_tweets(data){
     });
 }
 
-function get_lists(){
-    console.log("get_lists")
-    return $.ajax({
-        url: '_get_lists',
-        type: 'get',
-        dataType: 'html',
-    });
-}
-
 function post_tweets(data){
     console.log("post_tweets")
+    console.log(data);
     return $.ajax({
         url: '_post_tweets',
         type: 'post',

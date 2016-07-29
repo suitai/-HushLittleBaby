@@ -7,92 +7,85 @@ import json
 from requests_oauthlib import OAuth1Session, oauth1_session
 from flask import session, request
 
+KEYS = {}
+KEYS['consumer_key'] = os.environ['CONSUMER_KEY']
+KEYS['consumer_secret'] = os.environ['CONSUMER_SECRET']
+KEYS['callback_url'] = os.environ['CALLBACK_URL']
+
+URLS = {}
+URLS['oauth'] = {
+        "request_token": "https://api.twitter.com/oauth/request_token",
+        "authenticate": "https://api.twitter.com/oauth/authenticate",
+        "access_token": "https://api.twitter.com/oauth/access_token",
+        "oauth2_token": "https://api.twitter.com/oauth2/token",
+        }
+URLS['get'] = {
+        "search": "https://api.twitter.com/1.1/search/tweets.json",
+        "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
+        "favorites": "https://api.twitter.com/1.1/favorites/list.json",
+        "lists": "https://api.twitter.com/1.1/lists/list.json",
+        "list_status": "https://api.twitter.com/1.1/lists/statuses.json",
+        "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
+        "trends": "https://api.twitter.com/1.1/trends/place.json"
+        }
+URLS['post'] = {
+        "favorite-create": "https://api.twitter.com/1.1/favorites/create.json",
+        "favorite-destroy": "https://api.twitter.com/1.1/favorites/destroy.json",
+        "retweet": "https://api.twitter.com/1.1/statuses/retweet/",
+        "unretweet": "https://api.twitter.com/1.1/statuses/unretweet/"
+        }
 
 class Tweet(object):
-    def __init__(self, filename):
-        self.urls = {}
-        self.woeids = {}
-        self.keys = {}
-        self.load_config(filename)
-        self.load_environ()
-
-    def load_config(self, filename):
-        with open(filename, 'r') as f:
-            config = json.load(f)
-        self.get_urls = config['get_urls']
-        self.post_urls = config['post_urls']
-        self.woeids = config['woeids']
-        print "INFO: load_config"
-
-    def load_environ(self):
-        self.keys['consumer_key'] = os.environ['CONSUMER_KEY']
-        self.keys['consumer_secret'] = os.environ['CONSUMER_SECRET']
-        self.keys['callback_url'] = os.environ['CALLBACK_URL']
-        print "INFO: load_keys"
-
-    def get_redirect_url(self):
-        oauth = OAuth1Session(
-                self.keys['consumer_key'],
-                client_secret=self.keys['consumer_secret'],
-                callback_uri=self.keys['callback_url'])
-        try:
-            oauth.fetch_request_token(self.get_urls['request_token'])
-            return oauth.authorization_url(self.get_urls['authenticate'])
-        except oauth1_session.TokenRequestDenied as detail:
-            raise RequestDenied(detail)
+    def __init__(self):
+        self.token = {}
+        self.set_access_token()
+        self.set_oauth()
 
     def set_access_token(self):
-        if session.get('access_token') is not None:
-            access_token = session.get('access_token')
-        else:
-            request_token = get_request_token()
-            oauth = OAuth1Session(
-                    self.keys['consumer_key'],
-                    client_secret=self.keys['consumer_secret'],
-                    resource_owner_key=request_token['oauth_token'],
-                    verifier=request_token['oauth_verifier'])
-            try:
-                access_token = oauth.fetch_access_token(self.get_urls['access_token'])
-            except oauth1_session.TokenRequestDenied as detail:
-                raise RequestDenied(detail)
+        access_token = get_access_token()
+        self.token['access_token'] = access_token['oauth_token']
+        self.token['access_token_secret'] = access_token['oauth_token_secret']
 
-            if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
-                session['access_token'] = access_token
+    def set_oauth(self):
+        self.oauth = OAuth1Session(
+                KEYS['consumer_key'],
+                client_secret=KEYS['consumer_secret'],
+                resource_owner_key=self.token['access_token'],
+                resource_owner_secret=self.token['access_token_secret'])
 
-        self.keys['access_token'] = access_token['oauth_token']
-        self.keys['access_token_secret'] = access_token['oauth_token_secret']
-        print "access_token:", access_token
+    def get_tweets(self, twtype, params={}):
+        if twtype in ['retweet', 'unretweet']:
+            url = URLS['post'][twtype] + params['id'] + ".json"
+            method = "post"
+        elif twtype in URLS['post'].keys():
+            url = URLS['post'][twtype]
+            method = "post"
+        elif twtype in URLS['get'].keys():
+            url = URLS['get'][twtype]
+            method = "get"
 
-    def get_tweets(self, case, params={}):
-        oauth = OAuth1Session(
-                self.keys['consumer_key'],
-                client_secret=self.keys['consumer_secret'],
-                resource_owner_key=self.keys['access_token'],
-                resource_owner_secret=self.keys['access_token_secret'])
         try:
-            res = oauth.get(self.get_urls[case], params=params)
+            if method == "get":
+                res = self.oauth.get(url, params=params)
+            elif method == "post":
+                res = self.oauth.post(url, params=params)
             return json.loads(res.text)
+
         except oauth1_session.TokenRequestDenied as detail:
             print detail
             raise RequestDenied(detail)
 
-    def post_tweets(self, case, params={}):
-        if case in ['retweet', 'unretweet']:
-            url = self.post_urls[case] + params['id'] + ".json"
-        else:
-            url = self.post_urls[case]
 
-        oauth = OAuth1Session(
-                self.keys['consumer_key'],
-                client_secret=self.keys['consumer_secret'],
-                resource_owner_key=self.keys['access_token'],
-                resource_owner_secret=self.keys['access_token_secret'])
-        try:
-            res = oauth.post(url, params=params)
-            return json.loads(res.text)
-        except oauth1_session.TokenRequestDenied as detail:
-            print detail
-            raise RequestDenied(detail)
+def get_redirect_url():
+    oauth = OAuth1Session(
+            KEYS['consumer_key'],
+            client_secret=KEYS['consumer_secret'],
+            callback_uri=KEYS['callback_url'])
+    try:
+        oauth.fetch_request_token(URLS['oauth']['request_token'])
+        return oauth.authorization_url(URLS['oauth']['authenticate'])
+    except oauth1_session.TokenRequestDenied as detail:
+        raise RequestDenied(detail)
 
 
 def get_request_token():
@@ -106,6 +99,27 @@ def get_request_token():
             session['request_token'] = request_token
     print "request_token:", request_token
     return request_token
+
+
+def get_access_token():
+    if session.get('access_token') is not None:
+        access_token = session.get('access_token')
+    else:
+        request_token = get_request_token()
+        oauth = OAuth1Session(
+                KEYS['consumer_key'],
+                client_secret=KEYS['consumer_secret'],
+                resource_owner_key=request_token['oauth_token'],
+                verifier=request_token['oauth_verifier'])
+        try:
+            access_token = oauth.fetch_access_token(URLS['oauth']['access_token'])
+        except oauth1_session.TokenRequestDenied as detail:
+            raise RequestDenied(detail)
+
+        if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
+            session['access_token'] = access_token
+    print "access_token:", access_token
+    return access_token
 
 
 def check_token():
