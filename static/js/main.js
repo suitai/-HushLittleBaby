@@ -1,23 +1,30 @@
 $(function() {
 
     write_lists();
-
-    show_twtype("timeline");
-
+    show_tweets("timeline", {}, "overwrite");
     $("#search-text").val("");
 
     $("button.timeline").on('click', function() {
-        show_twtype("timeline");
+        show_tweets("timeline", {}, "overwrite");
     });
     $("button.favorites").on('click', function() {
-        show_twtype("favorites");
+        show_tweets("favorites", {}, "overwrite");
     });
     $("select.lists").change(function() {
-        show_list($("select.lists option:selected").val());
+        show_tweets(
+            "list_status",
+            {list_id: $("select.lists option:selected").val()},
+            "overwrite"
+        );
     });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
-        show_search($(":text[name='search']").val());
+        show_tweets(
+            "search",
+            { q: $(":text[name='search']").val()},
+            "overwrite"
+        );
+    });
     });
 
     $(document).on('click', "span.retweet-count" , function() {
@@ -88,14 +95,12 @@ function show_list(list_id) {
     });
 }
 
-function show_search(query) {
+function show_tweets(twtype, params, mode) {
+    params['count'] = 100;
     write_tweets({
-        twtype: "search",
-        params: {
-            q: query,
-            result_type: "recent",
-            count: 100
-        }
+        twtype: twtype,
+        params: params,
+        mode: mode
     });
 }
 
@@ -128,9 +133,15 @@ function request_post(data) {
 
 function write_tweets(data) {
     disable_button(true);
-    $('.content').html("");
+    if (data['mode'] == "overwrite") {
+        $('.content').html("");
+    }
     get_tweets(data).done(function(result) {
-        $('.content').html(result);
+        switch (data['mode']) {
+            case "overwrite":
+                $('.content').html(result);
+                break;
+        }
     }).fail(function(result) {
         $('.content').html("<p>" + result.statusText + "</p>");
         console.log("error");
