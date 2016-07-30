@@ -75,6 +75,10 @@ class Tweet(object):
             print detail
             raise RequestDenied(detail)
 
+        except ValueError as detail:
+            print "response:", res.text
+            return None
+
 
 def get_redirect_url():
     oauth = OAuth1Session(
