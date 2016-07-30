@@ -75,7 +75,7 @@ def _get_tweets():
         return render_template('error.html', message=rtn)
 
     print "tweets_num:", len(tweets)
-    return render_tweets(request.json['twtype'], tweets)
+    return render_tweets(request.json, tweets)
 
 
 @app.route('/_post_tweets', methods=['POST'])
@@ -121,11 +121,11 @@ def check_tweets(tweets):
     return None
 
 
-def render_tweets(twtype, tweets):
-    if twtype in ["lists"]:
+def render_tweets(req, tweets):
+    if req['twtype'] in ["lists"]:
         return render_template('lists.html', lists=tweets)
 
-    elif twtype in ["search"]:
+    elif req['twtype'] in ["search"]:
         if 'statuses' in tweets.keys():
             tweets = tweets['statuses']
         return render_template('tweets.html', **locals())
