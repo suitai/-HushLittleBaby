@@ -1,23 +1,41 @@
-<div class="tweets" data-twtype={{ twtype }}>
-    {% for tweet in tweets %}
-    {% if 'media' in tweet.entities %}
-    <div class="tweet" id={{ tweet.id }}>
-        <div class="media">
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}" target="_blank">
-                <img src={{ tweet.entities.media[0].media_url_https }}>
-            </a>
-        </div>
-        {% if 'retweeted_status' in tweet %}
-        {% set tweet = tweet.retweeted_status %}
-        {% endif %}
-        <div class="user">
-            <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
-        </div>
-        <div class="count">
-            <span class=retweet-count data-retweeted={{ tweet.retweeted }}>⇄ {{ tweet.retweet_count }}</span>
-            <span class=favorite-count data-favorited={{ tweet.favorited }}>❤ {{ tweet.favorite_count }}</span>
-        </div>
-    </div>
+{% if req.mode == 'overwrite' %}
+{% if 'list_id' in req.params %}
+<div class="tweet-content" data-twtype={{ req.twtype }} data-list_id={{ req.params.list_id }}>
+{% elif 'q' in req.params %}
+<div class="tweet-content" data-twtype={{ req.twtype }} data-q={{ req.params.q }}>
+{% else %}
+<div class="tweet-content" data-twtype={{ req.twtype }}>
+{% endif %}
+{% endif %}
+    {% if req.mode in ['overwrite', 'prepend'] %}
+    <div class="tweet-newer" data-max_id={{ tweets[0].id }}>▲</div>
     {% endif %}
-    {% endfor %}
+    <div class="tweets">
+        {% for tweet in tweets %}
+        {% if 'media' in tweet.entities %}
+        <div class="tweet" data-id={{ tweet.id }}>
+            <div class="media">
+                <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}" target="_blank">
+                    <img src={{ tweet.entities.media[0].media_url_https }}>
+                </a>
+            </div>
+            {% if 'retweeted_status' in tweet %}
+            {% set tweet = tweet.retweeted_status %}
+            {% endif %}
+            <div class="user">
+                <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
+            </div>
+            <div class="count">
+                <span class=retweet-count data-retweeted={{ tweet.retweeted }}>⇄ {{ tweet.retweet_count }}</span>
+                <span class=favorite-count data-favorited={{ tweet.favorited }}>❤ {{ tweet.favorite_count }}</span>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% if req.mode in ['overwrite', 'append'] %}
+    <div class="tweet-older" data-since_id={{ tweets[-1].id }}>▼</div>
+    {% endif %}
+{% if req.mode in ['overwrite'] %}
 </div>
+{% endif %}
