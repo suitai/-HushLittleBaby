@@ -28,7 +28,7 @@ $(function() {
     });
 
     $(document).on('click', "span.retweet-count" , function() {
-        var tweet_id = $(this).parent().parent().attr('id');
+        var tweet_id = $(this).parent().parent().attr('data-id');
         if ($(this).attr("data-retweeted") == "False")  {
             if (change_status("retweet", tweet_id)) {
                 $(this).attr("data-retweeted", "True");
@@ -42,7 +42,7 @@ $(function() {
         }
     });
     $(document).on('click', "span.favorite-count" , function() {
-        var tweet_id = $(this).parent().parent().attr('id');
+        var tweet_id = $(this).parent().parent().attr('data-id');
         if ($(this).attr("data-favorited") == "False")  {
             if (change_status("favorite-create", tweet_id)) {
                 $(this).attr("data-favorited", "True");
