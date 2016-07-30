@@ -2,12 +2,23 @@ $tweet-size: 250px;
 $img-size: 200px;
 $tweet-font-size: 12px;
 $menu-color: #00ccff;
+$view-color: #ccffff;
+$back-color: #f0f0f0;
 $retweet-color: #00cc00;
 $favorite-color: #ff0000;
 $default-color: #666666;
 
 .menu {
     background-color: $menu-color;
+    h1 {
+        margin-left: 10px;
+    }
+    .twtype-button {
+        margin-left: 10px;
+    }
+    .search-form {
+        margin-left: 10px;
+    }
 }
 
 .content {
