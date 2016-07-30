@@ -76,22 +76,7 @@ $(function() {
             $(this).css('color', "#666666");
         }
     });
-});
-
-function show_twtype(twtype) {
-    write_tweets({
-        twtype: twtype,
-        params: {count: 100}
     });
-}
-
-function show_list(list_id) {
-    write_tweets({
-        twtype: "list_status",
-        params: {
-            list_id: list_id,
-            count: 100
-        }
     });
 }
 
