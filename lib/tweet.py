@@ -89,6 +89,7 @@ def get_redirect_url():
         oauth.fetch_request_token(URLS['oauth']['request_token'])
         return oauth.authorization_url(URLS['oauth']['authenticate'])
     except oauth1_session.TokenRequestDenied as detail:
+        clean_session()
         raise RequestDenied(detail)
 
 
@@ -118,6 +119,7 @@ def get_access_token():
         try:
             access_token = oauth.fetch_access_token(URLS['oauth']['access_token'])
         except oauth1_session.TokenRequestDenied as detail:
+            clean_session()
             raise RequestDenied(detail)
 
         if access_token['oauth_token'] is not None and access_token['oauth_token_secret'] is not None:
