@@ -90,8 +90,19 @@ $(function() {
             $(this).css('color', "#666666");
         }
     });
+    $(document).on('mouseover',"div.tweet-newer", function() {
+        $(this).css('background-color', "#f0f0f0");
     });
+    $(document).on('mouseout',"div.tweet-newer" ,function() {
+        $(this).css('background-color', "#ffffff");
     });
+    $(document).on('mouseover',"div.tweet-older", function() {
+        $(this).css('background-color', "#f0f0f0");
+    });
+    $(document).on('mouseout',"div.tweet-older" ,function() {
+        $(this).css('background-color', "#ffffff");
+    });
+});
 
 function update_tweets(twtype, params, mode) {
     if (twtype == "search") {
