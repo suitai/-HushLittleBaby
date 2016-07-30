@@ -25,6 +25,20 @@ $(function() {
             "overwrite"
         );
     });
+
+    $(document).on('click', "div.tweet-newer" , function() {
+        update_tweets(
+            $('div.tweet-content').attr('data-twtype'),
+            {since_id: $(this).attr('data-max_id')},
+            "prepend"
+        );
+    });
+    $(document).on('click', "div.tweet-older" , function() {
+        update_tweets(
+            $('div.tweet-content').attr('data-twtype'),
+            {max_id: $(this).attr('data-since_id')},
+            "append"
+        );
     });
 
     $(document).on('click', "span.retweet-count" , function() {
@@ -78,6 +92,14 @@ $(function() {
     });
     });
     });
+
+function update_tweets(twtype, params, mode) {
+    if (twtype == "search") {
+        params['q'] = $('div.tweet-content').attr('data-q');
+    } else if (twtype == "list_status") {
+        params['list_id'] = $('div.tweet-content').attr('data-list_id');
+    }
+    show_tweets(twtype, params, mode);
 }
 
 function show_tweets(twtype, params, mode) {
@@ -128,6 +150,27 @@ function write_tweets(data) {
         switch (data['mode']) {
             case "overwrite":
                 $('.content').html(result);
+                break;
+            case "prepend":
+                $('.tweet-content').prepend(result);
+                if ($('.error').length == 0) {
+                    $('.tweet-newer:last').remove();
+                    if ($('.tweets').length > 1) {
+                        $('.tweets:first').append($('.tweets:last').children());
+                        $('.tweets:last').remove();
+                        $('.tweet[data-id=]')
+                    }
+                }
+                break;
+            case "append":
+                $('.tweet-content').append(result);
+                if ($('.error').length == 0) {
+                    $('.tweet-older:first').remove();
+                    if ($('.tweets').length > 1) {
+                        $('.tweets:first').append($('.tweets:last').children());
+                        $('.tweets:last').remove();
+                    }
+                }
                 break;
         }
     }).fail(function(result) {
