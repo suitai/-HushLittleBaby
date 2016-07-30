@@ -21,8 +21,16 @@ $default-color: #666666;
     }
 }
 
-.content {
+.tweet-newer {
+    margin-bottom: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.tweet-older {
     margin-top: 10px;
+    text-align: center;
+    cursor: pointer;
 }
 
 .tweets {
