@@ -118,6 +118,9 @@ function request_post(data) {
 
 function write_tweets(data) {
     disable_button(true);
+    if ($('.error').length > 0) {
+        $('.error').remove();
+    }
     if (data['mode'] == "overwrite") {
         $('.content').html("");
     }
