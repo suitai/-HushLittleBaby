@@ -101,10 +101,6 @@ def get_tweets(twtype, params):
     except tweet.RequestDenied as detail:
         print "ERROR:", detail
         return None
-
-    with open("timeline.json", 'w') as f:
-        json.dump(tweets, f)
-
     return tweets
 
 
