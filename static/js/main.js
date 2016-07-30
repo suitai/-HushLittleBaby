@@ -130,8 +130,10 @@ function change_status(twtype, id) {
 }
 
 function disable_button(status) {
-    $("#timeline-button").prop('disabled', status);
-    $("#favorites-button").prop('disabled', status);
+    $("button.timeline-button").prop('disabled', status);
+    $("button.favorites-button").prop('disabled', status);
+    $("select.lists").prop('disabled', status);
+    $("form.search-form").prop('disabled', status);
 }
 
 function request_post(data) {
