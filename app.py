@@ -11,8 +11,6 @@ from flask import Flask, session, request, redirect, render_template
 from flask_assets import Environment, Bundle
 from lib import tweet
 
-CONFIG_FILE = "etc/tweet.json"
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
