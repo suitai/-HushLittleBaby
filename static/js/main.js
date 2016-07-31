@@ -158,6 +158,8 @@ function write_tweets(data) {
     }
     if (data['mode'] == "overwrite") {
         $('.content').html("");
+        $('#lightbox').remove();
+        $('#lightboxOverlay').remove();
     }
     get_tweets(data).done(function(result) {
         switch (data['mode']) {
