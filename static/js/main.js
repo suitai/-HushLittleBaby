@@ -130,8 +130,8 @@ function change_status(twtype, id) {
 }
 
 function disable_button(status) {
-    $("button.timeline-button").prop('disabled', status);
-    $("button.favorites-button").prop('disabled', status);
+    $("button.timeline").prop('disabled', status);
+    $("button.favorites").prop('disabled', status);
     $("select.lists").prop('disabled', status);
     $("form.search-form").prop('disabled', status);
 }
