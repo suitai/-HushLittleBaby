@@ -175,7 +175,6 @@ function write_tweets(data) {
                     if ($('.tweets').length > 1) {
                         $('.tweets:first').append($('.tweets:last').children());
                         $('.tweets:last').remove();
-                        $('.tweet[data-id=]')
                     }
                 }
                 break;
