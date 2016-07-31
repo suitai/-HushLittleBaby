@@ -1,4 +1,7 @@
 {% if req.mode == 'overwrite' %}
+<script type="text/javascript" src="{{ url_for('static', filename='lightbox2-master/dist/js/lightbox.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lightbox-option.js') }}"></script>
+<link type="text/css" href="{{ url_for('static', filename='lightbox2-master/dist/css/lightbox.css') }}" rel="stylesheet"/>
 {% if 'list_id' in req.params %}
 <div class="tweet-content" data-twtype={{ req.twtype }} data-list_id={{ req.params.list_id }}>
 {% elif 'q' in req.params %}
@@ -15,7 +18,7 @@
         {% if 'media' in tweet.entities %}
         <div class="tweet" data-id={{ tweet.id }}>
             <div class="media">
-                <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id }}" target="_blank">
+                <a href="{{ tweet.entities.media[0].media_url_https }}" data-lightbox="tweets" data-title="{{ tweet.text }}">
                     <img src={{ tweet.entities.media[0].media_url_https }}>
                 </a>
             </div>
