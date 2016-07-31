@@ -1,0 +1,19 @@
+{
+  "name": "twixiv",
+  "version": "1.0.0",
+  "description": "twitter の画像を一覧表示",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suitai/MyTweetApp.git"
+  },
+  "author": "suitai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/suitai/MyTweetApp/issues"
+  },
+  "homepage": "https://github.com/suitai/MyTweetApp#readme",
+  "dependencies": {
+    "jquery": "^3.1.0",
+    "lightbox2": "^2.8.2"
+  }
+}
