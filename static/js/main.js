@@ -167,9 +167,11 @@ function write_tweets(data) {
                 $('.content').html(result);
                 break;
             case "prepend":
+                var max_id = $('.tweet-older').attr('data-max_id');
                 $('.tweet-content').prepend(result);
                 if ($('.error').length == 0) {
                     $('.tweet-newer:last').remove();
+                    $('.tweet[data-id='+max_id+']:first').remove();
                     if ($('.tweets').length > 1) {
                         $('.tweets:first').append($('.tweets:last').children());
                         $('.tweets:last').remove();
@@ -178,9 +180,11 @@ function write_tweets(data) {
                 }
                 break;
             case "append":
+                var since_id = $('.tweet-older').attr('data-since_id');
                 $('.tweet-content').append(result);
                 if ($('.error').length == 0) {
                     $('.tweet-older:first').remove();
+                    $('.tweet[data-id='+since_id+']:first').remove();
                     if ($('.tweets').length > 1) {
                         $('.tweets:first').append($('.tweets:last').children());
                         $('.tweets:last').remove();
