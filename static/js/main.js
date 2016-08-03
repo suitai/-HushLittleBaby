@@ -1,6 +1,10 @@
 $(function() {
 
-    write_lists();
+    write_lists({
+        twtype: "lists",
+        params: {},
+        select: "select[name='lists']"
+    });
     show_tweets("home_timeline", {}, "overwrite");
     $("#search-text").val("");
 
@@ -200,13 +204,9 @@ function write_tweets(data) {
     disable_button(false);
 }
 
-function write_lists(){
-    data = {
-        twtype: "lists",
-        params: {}
-    }
+function write_lists(data){
     get_tweets(data).done(function(result) {
-        $("select[name='lists']").append(result);
+        $(data.select).append(result);
     }).fail(function(result) {
         console.log("error");
         console.log(result);
