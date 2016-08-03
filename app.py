@@ -7,7 +7,7 @@ import sys
 import logging
 import json
 from datetime import timedelta
-from flask import Flask, session, request, redirect, render_template
+from flask import Flask, session, request, redirect, render_template, flash
 from flask_assets import Environment, Bundle
 from lib import tweet
 
