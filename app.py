@@ -117,7 +117,7 @@ def check_tweets(tweets):
             print "ERROR: ", tweets
             return tweets['errors'][0]['message']
     if len(tweets) == 0:
-        return "tweets is not found"
+        return "Tweet Not Found"
     return None
 
 
