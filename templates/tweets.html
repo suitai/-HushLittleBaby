@@ -24,7 +24,7 @@
                     <img src={{ tweet.entities.media[0].media_url_https }}>
                 </a>
             </div>
-            <div class="user">
+            <div class="user" data-user_id={{ tweet.user.id }}>
                 <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
             </div>
             <div class="count">
