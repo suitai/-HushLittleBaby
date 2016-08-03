@@ -55,8 +55,14 @@ def logout():
 
 @app.route('/', methods=['GET'])
 def index():
-    print "INFO: index"
-    return render_template('index.html')
+    print "INFO: /"
+    try:
+        access_token = tweet.get_access_token();
+    except tweet.RequestDenied as detail:
+        print "ERROR:", detail
+        flash(detail)
+        return redirect('/logout')
+    return render_template('index.html', screen_name=access_token['screen_name'])
 
 
 @app.route('/_get_tweets', methods=['POST'])
