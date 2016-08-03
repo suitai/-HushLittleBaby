@@ -26,6 +26,13 @@ $(function() {
             "overwrite"
         );
     });
+    $("select.following").change(function() {
+        show_tweets(
+            "user_timeline",
+            {user_id: $("select.following option:selected").val()},
+            "overwrite"
+        );
+    });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
         show_tweets(
