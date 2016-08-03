@@ -7,7 +7,7 @@ import sys
 import logging
 import json
 from datetime import timedelta
-from flask import Flask, session, request, redirect, render_template, flash
+from flask import Flask, session, request, redirect, render_template, flash, jsonify
 from flask_assets import Environment, Bundle
 from lib import tweet
 
@@ -63,6 +63,12 @@ def index():
         flash(detail)
         return redirect('/logout')
     return render_template('index.html', screen_name=access_token['screen_name'])
+
+
+@app.route('/_get_ipaddr')
+def get_ipaddr():
+    print "INFO: _get_ipaddr"
+    return jsonify({'ip': request.remote_addr})
 
 
 @app.route('/_get_tweets', methods=['POST'])

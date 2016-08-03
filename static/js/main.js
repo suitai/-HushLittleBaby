@@ -1,5 +1,16 @@
 $(function() {
 
+    $.ajax({
+        url: '_get_ipaddr',
+        type: 'get',
+        dataType: 'json',
+    }).done(function(result) {
+        console.log(result);
+    }).fail(function(result) {
+        console.log("error");
+        console.log(result);
+    });
+
     write_lists({
         twtype: "lists",
         params: {},
