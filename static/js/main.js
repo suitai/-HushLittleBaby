@@ -154,42 +154,41 @@ function request_post(data) {
 
 function write_tweets(data) {
     disable_button(true);
-    if ($('.error').length > 0) {
-        $('.error').remove();
-    }
-    if (data['mode'] == "overwrite") {
-        $('.content').html("");
-        $('#lightbox').remove();
-        $('#lightboxOverlay').remove();
-    }
     get_tweets(data).done(function(result) {
+        var html = $.parseHTML(result);
+        var error = $(html).find('.error');
+
+        if (error.length > 0) {
+            alert($(error).find("p").text());
+            return;
+        }
+
         switch (data['mode']) {
             case "overwrite":
+                $('.content').html("");
+                $('#lightbox').remove();
+                $('#lightboxOverlay').remove();
                 $('.content').html(result);
                 break;
+
             case "prepend":
-                var max_id = $('.tweet-older').attr('data-max_id');
-                $('.tweet-content').prepend(result);
-                if ($('.error').length == 0) {
-                    $('.tweet-newer:last').remove();
-                    $('.tweet[data-id='+max_id+']:first').remove();
-                    if ($('.tweets').length > 1) {
-                        $('.tweets:first').append($('.tweets:last').children());
-                        $('.tweets:last').remove();
-                    }
-                }
+                var tweet = $(html).find('.tweet');
+                var newer = $(html).find('.tweet-newer');
+                var max_id = $('.tweet-newer').attr('data-max_id');
+                $('.tweet[data-id='+max_id+']:first').remove();
+                $('.tweet-newer').remove();
+                $('.tweets').prepend($(tweet));
+                $('.tweet-content').prepend(older);
                 break;
+
             case "append":
+                var tweet = $(html).find('.tweet');
+                var older = $(html).find('.tweet-older');
                 var since_id = $('.tweet-older').attr('data-since_id');
-                $('.tweet-content').append(result);
-                if ($('.error').length == 0) {
-                    $('.tweet-older:first').remove();
-                    $('.tweet[data-id='+since_id+']:first').remove();
-                    if ($('.tweets').length > 1) {
-                        $('.tweets:first').append($('.tweets:last').children());
-                        $('.tweets:last').remove();
-                    }
-                }
+                $('.tweet[data-id='+since_id+']:first').remove();
+                $('.tweet-older').remove();
+                $('.tweets').append($(tweet));
+                $('.tweet-content').append(older);
                 break;
         }
     }).fail(function(result) {
