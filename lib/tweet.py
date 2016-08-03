@@ -21,11 +21,11 @@ URLS['oauth'] = {
         }
 URLS['get'] = {
         "search": "https://api.twitter.com/1.1/search/tweets.json",
-        "timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
+        "home_timeline": "https://api.twitter.com/1.1/statuses/home_timeline.json",
         "favorites": "https://api.twitter.com/1.1/favorites/list.json",
         "lists": "https://api.twitter.com/1.1/lists/list.json",
         "list_status": "https://api.twitter.com/1.1/lists/statuses.json",
-        "user": "https://api.twitter.com/1.1/statuses/user_timeline.json",
+        "user_timeline": "https://api.twitter.com/1.1/statuses/user_timeline.json",
         "trends": "https://api.twitter.com/1.1/trends/place.json"
         }
 URLS['post'] = {

@@ -1,11 +1,11 @@
 $(function() {
 
     write_lists();
-    show_tweets("timeline", {}, "overwrite");
+    show_tweets("home_timeline", {}, "overwrite");
     $("#search-text").val("");
 
     $("button.timeline").on('click', function() {
-        show_tweets("timeline", {}, "overwrite");
+        show_tweets("home_timeline", {}, "overwrite");
     });
     $("button.favorites").on('click', function() {
         show_tweets("favorites", {}, "overwrite");
