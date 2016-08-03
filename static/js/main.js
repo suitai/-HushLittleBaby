@@ -147,7 +147,8 @@ function request_post(data) {
     }).fail(function(result) {
         console.log("error");
         console.log(result);
-        return false;
+        alert(result.statusTexte);
+        location.href = "/logout"
     });
 }
 
@@ -192,9 +193,10 @@ function write_tweets(data) {
                 break;
         }
     }).fail(function(result) {
-        $('.content').html("<p>" + result.statusText + "</p>");
         console.log("error");
         console.log(result);
+        alert(result.statusTexte);
+        location.href = "/logout"
     });
     disable_button(false);
 }
@@ -207,7 +209,10 @@ function write_lists(){
     get_tweets(data).done(function(result) {
         $("select[name='lists']").append(result);
     }).fail(function(result) {
+        console.log("error");
         console.log(result);
+        alert(result.statusTexte);
+        location.href = "/logout"
     });
 }
 
