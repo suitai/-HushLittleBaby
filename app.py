@@ -124,6 +124,8 @@ def check_tweets(tweets):
 def render_tweets(req, tweets):
     if req['twtype'] in ["lists"]:
         return render_template('lists.html', lists=tweets)
+    elif req['twtype'] in ["friends"]:
+        return render_template('lists.html', lists=tweets['users'])
 
     elif req['twtype'] in ["search"]:
         if 'statuses' in tweets.keys():

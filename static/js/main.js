@@ -5,6 +5,11 @@ $(function() {
         params: {},
         select: "select[name='lists']"
     });
+    write_lists({
+        twtype: "friends",
+        params: {count: 200},
+        select: "select[name='following']"
+    });
     show_tweets("home_timeline", {}, "overwrite");
     $("#search-text").val("");
 
