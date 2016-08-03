@@ -8,19 +8,22 @@
 {% else %}
 <div class="tweet-content" data-twtype={{ req.twtype }}>
 {% endif %}
-    <div class="tweet-newer" data-max_id={{ tweets[0].id }}>▲</div>
+    {% set max_id = tweets[0].id %}
+    {% set since_id = tweets[-1].id %}
+    <div class="tweet-newer" data-max_id={{ max_id }}>▲</div>
     <div class="tweets">
         {% for tweet in tweets %}
+        {% set tweet_id = tweet.id %}
+        {% if 'retweeted_status' in tweet %}
+        {% set tweet = tweet.retweeted_status %}
+        {% endif %}
         {% if 'media' in tweet.entities %}
-        <div class="tweet" data-id={{ tweet.id }}>
+        <div class="tweet" data-id={{ tweet_id }}>
             <div class="media">
                 <a href="{{ tweet.entities.media[0].media_url_https }}" data-lightbox="tweets" data-title="{{ tweet.text }}">
                     <img src={{ tweet.entities.media[0].media_url_https }}>
                 </a>
             </div>
-            {% if 'retweeted_status' in tweet %}
-            {% set tweet = tweet.retweeted_status %}
-            {% endif %}
             <div class="user">
                 <a href="https://twitter.com/{{ tweet.user.screen_name }}" target="_blank">{{ tweet.user.name }}</a>
             </div>
@@ -32,5 +35,5 @@
         {% endif %}
         {% endfor %}
     </div>
-    <div class="tweet-older" data-since_id={{ tweets[-1].id }}>▼</div>
+    <div class="tweet-older" data-since_id={{ since_id }}>▼</div>
 </div>
