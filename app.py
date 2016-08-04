@@ -68,7 +68,11 @@ def index():
 @app.route('/_get_ipaddr')
 def get_ipaddr():
     print "INFO: _get_ipaddr"
-    return jsonify({'ip': request.remote_addr})
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    return jsonify({'ip': ip})
 
 
 @app.route('/_get_tweets', methods=['POST'])
