@@ -20,6 +20,10 @@ scss = Bundle('scss/style.scss', filters='pyscss', output='css/style.css')
 assets.register('style_scss', scss)
 
 
+class TweetError(Exception):
+    pass
+
+
 @app.before_request
 def before_request():
     if request.path == '/login':
@@ -40,7 +44,11 @@ def before_request():
 
 @app.route('/login', methods=['GET'])
 def login():
-    redirect_url = tweet.get_redirect_url()
+    try:
+        redirect_url = tweet.get_redirect_url()
+    except tweet.RequestDenied as detail:
+        app.logger.error(detail)
+        raise
     app.logger.debug("redirect url: {}".format(redirect_url))
     return redirect(redirect_url)
 
@@ -113,12 +121,12 @@ def get_tweets(twtype, params):
 def check_tweets(tweets):
     if isinstance(tweets, dict):
         if 'error' in tweets.keys():
-            return tweets['error']
+            raise TweetError(tweets['error'])
         elif 'errors' in tweets.keys():
-            return tweets['errors'][0]['message']
+            raise TweetError(tweets['errors'][0]['message'])
     if len(tweets) == 0:
-        return "Tweet Not Found"
-    return None
+        raise TweetError("Tweet Not Found")
+    return
 
 
 def render_tweets(req, tweets):
