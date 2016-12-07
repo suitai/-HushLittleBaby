@@ -47,7 +47,6 @@ def login():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    print "INFO: logout"
     tweet.clean_session()
     return redirect('/login')
 
@@ -57,7 +56,6 @@ def index():
     try:
         access_token = tweet.get_access_token();
     except tweet.RequestDenied as detail:
-        print "ERROR:", detail
         flash(detail)
         return redirect('/logout')
     return render_template('index.html', screen_name=access_token['screen_name'])
@@ -108,7 +106,6 @@ def get_tweets(twtype, params):
     try:
         tweets = t.get_tweets(twtype, params)
     except tweet.RequestDenied as detail:
-        print "ERROR:", detail
         return None
     return tweets
 
