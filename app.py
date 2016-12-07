@@ -34,7 +34,7 @@ def before_request():
         return
     elif request.path[-3:] == ".js":
         return
-    elif tweet.check_token():
+    elif check_token():
         return
     else:
         session.permanent = True
@@ -48,6 +48,7 @@ def login():
         redirect_url = tweet.get_redirect_url()
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
+        clean_session()
         raise
     app.logger.debug("redirect url: {}".format(redirect_url))
     return redirect(redirect_url)
@@ -55,17 +56,14 @@ def login():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    tweet.clean_session()
+    clean_session()
     return redirect('/login')
 
 
 @app.route('/', methods=['GET'])
 def index():
-    try:
-        access_token = tweet.get_access_token();
-    except tweet.RequestDenied as detail:
-        flash(detail)
-        return redirect('/logout')
+    request_token = get_request_token()
+    access_token = get_access_token(request_token)
     return render_template('index.html', screen_name=access_token['screen_name'])
 
 
@@ -82,40 +80,84 @@ def get_ipaddr():
 @app.route('/_get_tweets', methods=['POST'])
 def _get_tweets():
     app.logger.debug("_get_tweets request: {}".format(request.json))
+    request_token = get_request_token()
+    access_token = get_access_token(request_token)
+    try:
+        tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
+        check_tweets(tweets)
+        app.logger.debug("tweets num: {}".format(len(tweets)))
+        return render_tweets(request.json, tweets)
 
-    tweets = get_tweets(request.json['twtype'], request.json['params'])
-    if tweets is None:
+    except tweet.RequestDenied as detail:
+        app.logger.error(detail)
         return redirect('/logout')
 
-    rtn = check_tweets(tweets)
-    if rtn is not None:
-        return render_template('error.html', message=rtn)
-
-    return render_tweets(request.json, tweets)
+    except TweetError as detail:
+        app.logger.error(detail)
+        return render_template('error.html', message=detail)
 
 
 @app.route('/_post_tweets', methods=['POST'])
 def _post_tweets():
     app.logger.debug("_post_tweets request: {}".format(request.json))
-
-    tweets = get_tweets(request.json['twtype'], request.json['params'])
-    if tweets is None:
+    try:
+        tweets = tweet.get_tweets(request.json['twtype'], request.json['params'])
+    except tweet.RequestDenied as detail:
+        app.logger.error(detail)
         return redirect('/logout')
 
-    rtn = check_tweets(tweets)
-    if rtn is not None:
-        return rtn
-    else:
-        return "success"
-
-
-def get_tweets(twtype, params):
-    t = tweet.Tweet()
     try:
-        tweets = t.get_tweets(twtype, params)
-    except tweet.RequestDenied as detail:
-        return None
-    return tweets
+        check_tweets(tweets)
+    except TweetError as detail:
+        app.logger.error(detail)
+        return detail
+
+    return "success"
+
+
+def get_request_token():
+    if 'request_token' in session:
+        request_token = session['request_token']
+    else:
+        request_token = {'oauth_token': request.values.get('oauth_token'),
+                         'oauth_verifier': request.values.get('oauth_verifier')}
+        if ((request_token['oauth_token'] is not None) and
+                (request_token['oauth_verifier'] is not None)):
+            session['request_token'] = request_token
+    return request_token
+
+
+def get_access_token(request_token):
+    if 'access_token' in session:
+        access_token = session['access_token']
+    else:
+        try:
+            access_token = tweet.get_access_token(request_token)
+        except tweet.RequestDenied as detail:
+            app.logger.error(detail)
+            clean_session()
+            flash(detail)
+            return redirect('/logout')
+        if ((access_token['oauth_token'] is not None) and
+                (access_token['oauth_token_secret'] is not None)):
+            session['access_token'] = access_token
+    return access_token
+
+
+def check_token():
+    result = False
+    if 'access_token' in session:
+        result = True
+    elif 'request_token' in session:
+        result = True
+    else:
+        request_token = get_request_token()
+        if ((request_token['oauth_token'] is not None) and
+                (request_token['oauth_verifier'] is not None)):
+            result = True
+        else:
+            result = False
+    return result
 
 
 def check_tweets(tweets):
