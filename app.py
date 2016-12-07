@@ -22,7 +22,6 @@ assets.register('style_scss', scss)
 
 @app.before_request
 def before_request():
-    print "INFO: before_request"
     if request.path == '/login':
         return
     elif request.path == '/logout':
@@ -41,8 +40,8 @@ def before_request():
 
 @app.route('/login', methods=['GET'])
 def login():
-    print "INFO: login"
     redirect_url = tweet.get_redirect_url()
+    app.logger.debug("redirect url: {}".format(redirect_url))
     return redirect(redirect_url)
 
 
@@ -55,7 +54,6 @@ def logout():
 
 @app.route('/', methods=['GET'])
 def index():
-    print "INFO: /"
     try:
         access_token = tweet.get_access_token();
     except tweet.RequestDenied as detail:
@@ -67,18 +65,17 @@ def index():
 
 @app.route('/_get_ipaddr')
 def get_ipaddr():
-    print "INFO: _get_ipaddr"
     if request.headers.getlist("X-Forwarded-For"):
         ip = request.headers.getlist("X-Forwarded-For")[0]
     else:
         ip = request.remote_addr
+    app.logger.info("ipaddr: {}".format(ip))
     return jsonify({'ip': ip})
 
 
 @app.route('/_get_tweets', methods=['POST'])
 def _get_tweets():
-    print "INFO: _get_tweets"
-    print "request:", request.json
+    app.logger.debug("_get_tweets request: {}".format(request.json))
 
     tweets = get_tweets(request.json['twtype'], request.json['params'])
     if tweets is None:
@@ -88,14 +85,12 @@ def _get_tweets():
     if rtn is not None:
         return render_template('error.html', message=rtn)
 
-    print "tweets_num:", len(tweets)
     return render_tweets(request.json, tweets)
 
 
 @app.route('/_post_tweets', methods=['POST'])
 def _post_tweets():
-    print "INFO: _post_tweets"
-    print "request:", request.json
+    app.logger.debug("_post_tweets request: {}".format(request.json))
 
     tweets = get_tweets(request.json['twtype'], request.json['params'])
     if tweets is None:
@@ -121,10 +116,8 @@ def get_tweets(twtype, params):
 def check_tweets(tweets):
     if isinstance(tweets, dict):
         if 'error' in tweets.keys():
-            print "ERROR: ", tweets
             return tweets['error']
         elif 'errors' in tweets.keys():
-            print "ERROR: ", tweets
             return tweets['errors'][0]['message']
     if len(tweets) == 0:
         return "Tweet Not Found"
@@ -136,17 +129,19 @@ def render_tweets(req, tweets):
         return render_template('lists.html', lists=tweets)
     elif req['twtype'] in ["friends"]:
         return render_template('lists.html', lists=tweets['users'])
-
     elif req['twtype'] in ["search"]:
         if 'statuses' in tweets.keys():
             tweets = tweets['statuses']
         return render_template('tweets.html', **locals())
-
     else:
         return render_template('tweets.html', **locals())
 
 
+def clean_session():
+    for s in ['request_token', 'access_token']:
+        session.pop(s, None)
+
+
 if __name__ == "__main__":
     app.debug = True
-    app.logger.addHandler(logging.StreamHandler(sys.stdout))
     app.run(threaded=True)
