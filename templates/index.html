@@ -1,6 +1,7 @@
 <html>
     <head>
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type="text/javascript" src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
         {% assets "style_scss" %}
         <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
@@ -28,6 +29,12 @@
             </form>
         </div>
         <div class="content">
+            <div class="tweet-newer">▲</div>
+            <div class="tweet-content">
+                <div class="tweets">
+                </div>
+            </div>
+            <div class="tweet-older">▼</div>
         </div>
     </body>
 </html>
