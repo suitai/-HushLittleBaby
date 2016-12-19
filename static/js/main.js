@@ -1,119 +1,193 @@
-$(function() {
 
-    $.ajax({
-        url: '_get_ipaddr',
-        type: 'get',
-        dataType: 'json',
-    }).done(function(result) {
-        console.log(result);
-    }).fail(function(result) {
-        console.log("error");
-        console.log(result);
+var prepend_tweets = function(data, result)
+{
+    var array = [];
+
+    if (result["error"]) {
+        alert(result['error'][0]);
+        return;
+    }
+    $('div.tweet').each(function (i, elem) {
+        array.push(Number($(elem).attr('data-id')));
     });
+    for (key in result) {
+        if (($.inArray(result[key]['id'], array) == -1)) {
+            $.tmpl(tweet_tmpl, result[key]).prependTo(data.dest);
+        }
+    }
+    $('div.tweet-content').attr('data-twtype', data.twtype)
+}
 
-    write_lists({
+var append_tweets = function(data, result)
+{
+    var array = [];
+
+    if (result["error"]) {
+        alert(result['error'][0]);
+        return;
+    }
+    $('div.tweet').each(function (i, elem) {
+        array.push(Number($(elem).attr('data-id')));
+    });
+    for (key in result) {
+        if (($.inArray(result[key]['id'], array) == -1)) {
+            $.tmpl(tweet_tmpl, result[key]).appendTo(data.dest);
+        }
+    }
+    $('div.tweet-content').attr('data-twtype', data.twtype)
+}
+
+var append_lists = function(data, result)
+{
+    for (key in result) {
+        $.tmpl('<option value="${id}">${name}</option>', result[key]).appendTo(data.dest);
+    }
+}
+
+$(function()
+{
+    $.get("_get_ipaddr", function(data) { ipaddr = data; console.log(ipaddr);});
+    $.get("_get_tweet_template", function(data) { tweet_tmpl = data; });
+    $.get("_get_tweets_head", function(data) { $('.content').prepend(data); });
+
+    write_tweets({
         twtype: "lists",
         params: {},
-        select: "select[name='lists']"
-    });
-    write_lists({
+        dest: "select[name='lists']"
+    }, append_lists);
+
+    write_tweets({
         twtype: "friends",
         params: {count: 200},
-        select: "select[name='following']"
-    });
-    show_tweets("home_timeline", {}, "overwrite");
-    $("#search-text").val("");
+        dest: "select[name='following']"
+    }, append_lists);
+
+    params = {count: 100};
+    write_tweets({
+        twtype: "home_timeline",
+        params: params,
+        dest: "div.tweets"
+    }, append_tweets);
 
     $("button.timeline").on('click', function() {
-        show_tweets("home_timeline", {}, "overwrite");
+        $('div.tweet').remove();
+        params = {count: 100};
+        write_tweets({
+            twtype: "home_timeline",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
     $("button.favorites").on('click', function() {
-        show_tweets("favorites", {}, "overwrite");
+        $('div.tweet').remove();
+        params = {count: 100};
+        write_tweets({
+            twtype: "favorites",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
     $("select.lists").change(function() {
-        show_tweets(
-            "list_status",
-            {list_id: $("select.lists option:selected").val()},
-            "overwrite"
-        );
+        $('div.tweet').remove();
+        params = {list_id: $("select.lists option:selected").val(),
+                  count: 100};
+        write_tweets({
+            twtype: "list_status",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
     $("select.following").change(function() {
-        show_tweets(
-            "user_timeline",
-            {user_id: $("select.following option:selected").val()},
-            "overwrite"
-        );
+        $('div.tweet').remove();
+        params = {user_id: $("select.following option:selected").val(),
+                  count: 100};
+        write_tweets({
+            twtype: "user_timeline",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
     $("form[name='search']").submit(function(event) {
         event.preventDefault();
-        show_tweets(
-            "search",
-            { q: $(":text[name='search']").val()},
-            "overwrite"
-        );
+        $('div.tweet').remove();
+        params = {q: $(":text[name='search']").val()};
+        write_tweets({
+            twtype: "search",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
 
     $(document).on('click', "div.tweet-newer" , function() {
-        update_tweets(
-            $('div.tweet-content').attr('data-twtype'),
-            {since_id: $(this).attr('data-max_id')},
-            "prepend"
-        );
+        var tmp_params = params;
+        tmp_params['since_id'] = $('div.tweet').eq(0).attr('data-id');
+
+        write_tweets({
+            twtype: $('div.tweet-content').attr('data-twtype'),
+            params: tmp_params,
+            dest: "div.tweets"
+        }, prepend_tweets);
     });
     $(document).on('click', "div.tweet-older" , function() {
-        update_tweets(
-            $('div.tweet-content').attr('data-twtype'),
-            {max_id: $(this).attr('data-since_id')},
-            "append"
-        );
+        var tmp_params = params;
+        tmp_params['max_id'] = $('div.tweet').eq(-1).attr('data-id');
+        write_tweets_js({
+            twtype: $('div.tweet-content').attr('data-twtype'),
+            params: tmp_params,
+            dest: "div.tweets"
+        }, append_tweets);
     });
 
     $(document).on('click', "span.retweet-count" , function() {
         var tweet_id = $(this).parent().parent().attr('data-id');
-        if ($(this).attr("data-retweeted") == "False")  {
-            if (change_status("retweet", tweet_id)) {
-                $(this).attr("data-retweeted", "True");
+        if ($(this).attr("data-retweeted") == "false") {
+            var ret = request_post({twtype: "retweet", params: {id: tweet_id}});
+            if (ret) {
+                $(this).attr("data-retweeted", "true");
                 $(this).css('color', "#00cc00");
             }
-        } else if ($(this).attr("data-retweeted") == "True")  {
-            if (change_status("unretweet", tweet_id)) {
-                $(this).attr("data-retweeted", "False");
+        } else if ($(this).attr("data-retweeted") == "true") {
+            var ret = request_post({twtype: "unretweet", params: {id: tweet_id}});
+            if (ret) {
+                $(this).attr("data-retweeted", "false");
                 $(this).css('color', "#666666");
             }
         }
     });
     $(document).on('click', "span.favorite-count" , function() {
         var tweet_id = $(this).parent().parent().attr('data-id');
-        if ($(this).attr("data-favorited") == "False")  {
-            if (change_status("favorite-create", tweet_id)) {
-                $(this).attr("data-favorited", "True");
+        if ($(this).attr("data-favorited") == "false") {
+            var ret = request_post({twtype: "favorite-create", params: {id: tweet_id}});
+            if (ret) {
+                $(this).attr("data-favorited", "true");
                 $(this).css('color', "#ff0000");
             }
-        } else if ($(this).attr("data-favorited") == "True")  {
-            if (change_status("favorite-destroy", tweet_id)) {
-                $(this).attr("data-favorited", "False");
+        } else if ($(this).attr("data-favorited") == "true")  {
+            var ret = request_post({twtype: "favorite-destroy", params: {id: tweet_id}});
+            if (ret) {
+                $(this).attr("data-favorited", "false");
                 $(this).css('color', "#666666");
             }
         }
     });
 
     $(document).on('mouseover',"span.retweet-count", function() {
-        if ($(this).attr("data-retweeted") == "False")  {
+        if ($(this).attr("data-retweeted") == "false")  {
             $(this).css('color', "#00cc00");
         }
     });
     $(document).on('mouseout',"span.retweet-count", function() {
-        if ($(this).attr("data-retweeted") == "False")  {
+        if ($(this).attr("data-retweeted") == "false")  {
             $(this).css('color', "#666666");
         }
     });
     $(document).on('mouseover',"span.favorite-count", function() {
-        if ($(this).attr("data-favorited") == "False")  {
+        if ($(this).attr("data-favorited") == "false")  {
             $(this).css('color', "#ff0000");
         }
     });
     $(document).on('mouseout',"span.favorite-count" ,function() {
-        if ($(this).attr("data-favorited") == "False")  {
+        if ($(this).attr("data-favorited") == "false")  {
             $(this).css('color', "#666666");
         }
     });
@@ -131,31 +205,6 @@ $(function() {
     });
 });
 
-function update_tweets(twtype, params, mode) {
-    if (twtype == "search") {
-        params['q'] = $('div.tweet-content').attr('data-q');
-    } else if (twtype == "list_status") {
-        params['list_id'] = $('div.tweet-content').attr('data-list_id');
-    }
-    show_tweets(twtype, params, mode);
-}
-
-function show_tweets(twtype, params, mode) {
-    params['count'] = 100;
-    write_tweets({
-        twtype: twtype,
-        params: params,
-        mode: mode
-    });
-}
-
-function change_status(twtype, id) {
-    return request_post({
-        twtype: twtype,
-        params: {id: id}
-    });
-}
-
 function disable_button(status) {
     $("button.timeline").prop('disabled', status);
     $("button.favorites").prop('disabled', status);
@@ -163,61 +212,11 @@ function disable_button(status) {
     $("form.search-form").prop('disabled', status);
 }
 
-function request_post(data) {
-    return post_tweets(data).done(function(result) {
-        console.log(result);
-        if (result == "success") {
-            return true;
-        } else {
-            return false;
-        }
-    }).fail(function(result) {
-        console.log("error");
-        console.log(result);
-        alert(result.statusTexte);
-        location.href = "/logout"
-    });
-}
-
-function write_tweets(data) {
+function write_tweets(data, func)
+{
     disable_button(true);
-    get_tweets(data).done(function(result) {
-        var html = $.parseHTML(result);
-        var error = $(html).find('.error');
-
-        if (error.length > 0) {
-            alert($(error).find("p").text());
-            return;
-        }
-
-        switch (data['mode']) {
-            case "overwrite":
-                $('.content').html("");
-                $('#lightbox').remove();
-                $('#lightboxOverlay').remove();
-                $('.content').html(result);
-                break;
-
-            case "prepend":
-                var tweet = $(html).find('.tweet');
-                var newer = $(html).find('.tweet-newer');
-                var max_id = $('.tweet-newer').attr('data-max_id');
-                $('.tweet[data-id='+max_id+']:first').remove();
-                $('.tweet-newer').remove();
-                $('.tweets').prepend($(tweet));
-                $('.tweet-content').prepend(older);
-                break;
-
-            case "append":
-                var tweet = $(html).find('.tweet');
-                var older = $(html).find('.tweet-older');
-                var since_id = $('.tweet-older').attr('data-since_id');
-                $('.tweet[data-id='+since_id+']:first').remove();
-                $('.tweet-older').remove();
-                $('.tweets').append($(tweet));
-                $('.tweet-content').append(older);
-                break;
-        }
+    get_tweets_js(data).done(function (result) {
+        func(data, result);
     }).fail(function(result) {
         console.log("error");
         console.log(result);
@@ -227,19 +226,19 @@ function write_tweets(data) {
     disable_button(false);
 }
 
-function write_lists(data){
-    get_tweets(data).done(function(result) {
-        $(data.select).append(result);
-    }).fail(function(result) {
-        console.log("error");
-        console.log(result);
-        alert(result.statusTexte);
-        location.href = "/logout"
+function get_tweets_js(data){
+    console.log(data);
+    return $.ajax({
+        url: '_get_tweets_js',
+        type: 'post',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'json',
     });
 }
 
 function get_tweets(data){
-    console.log("get_tweets")
+    console.log("get_tweets");
     console.log(data);
     return $.ajax({
         url: '_get_tweets',
@@ -247,6 +246,23 @@ function get_tweets(data){
         data: JSON.stringify(data),
         contentType: 'application/json',
         dataType: 'html',
+    });
+}
+
+function request_post(data) {
+    return post_tweets(data).done(function(result) {
+        if (result == "success") {
+            return true;
+        } else {
+            console.log("error");
+            console.log(result);
+            alert(result);
+            return false;
+        }
+    }).fail(function(result) {
+        console.log("error");
+        console.log(result);
+        alert(result.statusTexte);
     });
 }
 

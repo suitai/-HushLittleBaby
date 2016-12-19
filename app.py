@@ -3,8 +3,6 @@
 
 
 import os
-import sys
-import logging
 import json
 from datetime import timedelta
 from flask import Flask, session, request, redirect, render_template, flash, jsonify
@@ -13,6 +11,7 @@ from lib import tweet
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['JSON_AS_ASCII'] = False
 
 assets = Environment(app)
 assets.url = app.static_url_path
@@ -21,6 +20,10 @@ assets.register('style_scss', scss)
 
 
 class TweetError(Exception):
+    pass
+
+
+class TokenError(Exception):
     pass
 
 
@@ -37,20 +40,20 @@ def before_request():
     elif check_token():
         return
     else:
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=5)
         return redirect('/login')
 
 
 @app.route('/login', methods=['GET'])
 def login():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
+
     try:
         redirect_url = tweet.get_redirect_url()
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
         clean_session()
         raise
-    app.logger.debug("redirect url: {}".format(redirect_url))
     return redirect(redirect_url)
 
 
@@ -62,8 +65,17 @@ def logout():
 
 @app.route('/', methods=['GET'])
 def index():
-    request_token = get_request_token()
-    access_token = get_access_token(request_token)
+    try:
+        request_token = get_request_token()
+        access_token = get_access_token(request_token)
+
+    except tweet.RequestDenied as detail:
+        app.logger.error(detail)
+        return redirect('/logout')
+
+    except TokenError:
+        return redirect('/logout')
+
     return render_template('index.html', screen_name=access_token['screen_name'])
 
 
@@ -77,16 +89,56 @@ def get_ipaddr():
     return jsonify({'ip': ip})
 
 
+@app.route('/_get_tweets_head')
+def _get_tweets_head():
+    return render_template('tweets-head.html')
+
+
+@app.route('/_get_tweet_template')
+def _get_tweet_template():
+    return render_template('tweet.html')
+
+
+@app.route('/_get_tweets_js', methods=['POST'])
+def _get_tweets_js():
+    app.logger.debug("_get_tweets_js request: {}".format(request.json))
+    try:
+        request_token = get_request_token()
+        access_token = get_access_token(request_token)
+        tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
+        check_tweets(tweets)
+
+    except tweet.RequestDenied as detail:
+        app.logger.error(detail)
+        return redirect('/logout')
+
+    except TweetError as detail:
+        app.logger.error(detail)
+        return jsonify({'error': detail.args})
+
+    send_data = None
+    if request.json['twtype'] in ["lists"]:
+        send_data = filter_lists(tweets)
+    elif request.json['twtype'] in ["friends"]:
+        send_data = filter_lists(tweets['users'])
+    elif request.json['twtype'] in ["search"]:
+        if 'status' in tweets.keys():
+            send_data = filter_tweets(tweets['statuses'])
+        else:
+            send_data = filter_tweets(tweets)
+    else:
+        send_data = filter_tweets(tweets)
+
+    return jsonify(send_data)
+
 @app.route('/_get_tweets', methods=['POST'])
 def _get_tweets():
     app.logger.debug("_get_tweets request: {}".format(request.json))
-    request_token = get_request_token()
-    access_token = get_access_token(request_token)
     try:
+        request_token = get_request_token()
+        access_token = get_access_token(request_token)
         tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
         check_tweets(tweets)
-        app.logger.debug("tweets num: {}".format(len(tweets)))
-        return render_tweets(request.json, tweets)
 
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
@@ -96,12 +148,17 @@ def _get_tweets():
         app.logger.error(detail)
         return render_template('error.html', message=detail)
 
+    return render_tweets(request.json, tweets)
+
 
 @app.route('/_post_tweets', methods=['POST'])
 def _post_tweets():
     app.logger.debug("_post_tweets request: {}".format(request.json))
     try:
-        tweets = tweet.get_tweets(request.json['twtype'], request.json['params'])
+        request_token = get_request_token()
+        access_token = get_access_token(request_token)
+        tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
+
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
         return redirect('/logout')
@@ -110,7 +167,7 @@ def _post_tweets():
         check_tweets(tweets)
     except TweetError as detail:
         app.logger.error(detail)
-        return detail
+        return detail.args
 
     return "success"
 
@@ -119,11 +176,15 @@ def get_request_token():
     if 'request_token' in session:
         request_token = session['request_token']
     else:
-        request_token = {'oauth_token': request.values.get('oauth_token'),
-                         'oauth_verifier': request.values.get('oauth_verifier')}
-        if ((request_token['oauth_token'] is not None) and
-                (request_token['oauth_verifier'] is not None)):
-            session['request_token'] = request_token
+        request_token = {'oauth_token': request.args.get('oauth_token'),
+                         'oauth_verifier': request.args.get('oauth_verifier')}
+        session['request_token'] = request_token
+
+    if ((request_token['oauth_token'] is None) or
+            (request_token['oauth_verifier'] is None)):
+        session.pop('request_token', None)
+        raise TokenError
+
     return request_token
 
 
@@ -133,31 +194,33 @@ def get_access_token(request_token):
     else:
         try:
             access_token = tweet.get_access_token(request_token)
-        except tweet.RequestDenied as detail:
-            app.logger.error(detail)
-            clean_session()
-            flash(detail)
-            return redirect('/logout')
-        if ((access_token['oauth_token'] is not None) and
-                (access_token['oauth_token_secret'] is not None)):
+            app.logger.info("screen_name: {}".format(access_token['screen_name']))
             session['access_token'] = access_token
+
+        except tweet.RequestDenied:
+            raise
+
+    if ((access_token['oauth_token'] is None) or
+            (access_token['oauth_token_secret'] is None)):
+        session.pop('access_token', None)
+        raise TokenError
+
     return access_token
 
 
 def check_token():
-    result = False
     if 'access_token' in session:
-        result = True
-    elif 'request_token' in session:
-        result = True
+        return True
+
+    if 'request_token' in session:
+        return True
+
+    try:
+        get_request_token()
+    except TokenError:
+        return False
     else:
-        request_token = get_request_token()
-        if ((request_token['oauth_token'] is not None) and
-                (request_token['oauth_verifier'] is not None)):
-            result = True
-        else:
-            result = False
-    return result
+        return True
 
 
 def check_tweets(tweets):
@@ -183,6 +246,38 @@ def render_tweets(req, tweets):
     else:
         return render_template('tweets.html', **locals())
 
+
+def filter_tweets(tweets):
+    send_tweets = []
+    for tw in tweets:
+        if 'media' not in tw['entities']:
+            continue
+        tweet_id = str(tw['id'])
+        if 'retweeted_status' in tw.keys():
+            tw = tw['retweeted_status']
+        tmp_tw = {'id': tweet_id,
+                  'media_url_https': tw['entities']['media'][0]['media_url_https'],
+                  'user_id': tw['user']['id'],
+                  'user_screen_name': tw['user']['screen_name'],
+                  'user_name': tw['user']['name'],
+                  'text': tw['text'],
+                  'retweet_count': tw['retweet_count'],
+                  'favorite_count': tw['favorite_count'],
+                  'retweeted': tw['retweeted'],
+                  'favorited': tw['favorited']
+                 }
+        send_tweets.append(tmp_tw)
+    return send_tweets
+
+
+def filter_lists(tweets):
+    send_lists = []
+    for tw in tweets:
+        tmp_tw = {'id': str(tw['id']),
+                  'name': tw['name']
+                 }
+        send_lists.append(tmp_tw)
+    return send_lists
 
 def clean_session():
     for s in ['request_token', 'access_token']:
