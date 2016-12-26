@@ -27,16 +27,41 @@ $default-color: #666666;
     }
 }
 
+.loader {
+    width: 100px;
+    height: 100px;
+    display: none;
+    position: fixed;
+    _position: absolute; /* IE6対策 */
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50Xpx;
+    z-index: 100;
+}
+
+.fade {
+    width: 100%;
+    height: 100%;
+    display: none;
+    background-color: #FFFFFF;
+    opacity: 0.7;
+    position: absolute;
+    z-index: 50;
+}
+
 .tweet-newer {
     margin-bottom: 10px;
     text-align: center;
     cursor: pointer;
+    font-size: 40px;
 }
 
 .tweet-older {
     margin-top: 10px;
     text-align: center;
     cursor: pointer;
+    font-size: 40px;
 }
 
 .tweets {
@@ -80,16 +105,16 @@ $default-color: #666666;
                 cursor: pointer;
                 font-size: $tweet-font-size;
             }
-            span[data-retweeted="True"] {
+            span[data-retweeted="true"] {
                 color: $retweet-color;
             }
-            span[data-retweeted="False"] {
+            span[data-retweeted="false"] {
                 color: $default-color;
             }
-            span[data-favorited="True"] {
+            span[data-favorited="true"] {
                 color: $favorite-color;
             }
-            span[data-favorited="False"] {
+            span[data-favorited="false"] {
                 color: $default-color;
             }
         }
