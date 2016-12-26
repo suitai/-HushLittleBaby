@@ -2,6 +2,9 @@
     <head>
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript" src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='iconate/dist/iconate.min.css') }}">
+        <script type="text/javascript" src="{{ url_for('static', filename='iconate/dist/iconate.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
         {% assets "style_scss" %}
         <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
@@ -29,12 +32,20 @@
             </form>
         </div>
         <div class="content">
-            <div class="tweet-newer">▲</div>
-            <div class="tweet-content">
+            <div class="tweet-newer">
+                <i class="fa fa-caret-up" aria-hidden="true"></i>
+            </div>
+            <div class="loader">
+                <img src="{{ url_for('static', filename='images/ajax-loader.gif') }}" alt="Loading..." />
+            </div>
+            <div class="fade"></div>
+            <div class="tweet-content" data-twtype="home_timeline">
                 <div class="tweets">
                 </div>
             </div>
-            <div class="tweet-older">▼</div>
+            <div class="tweet-older">
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </div>
         </div>
     </body>
 </html>
