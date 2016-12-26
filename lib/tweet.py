@@ -4,11 +4,9 @@
 
 import os
 import json
-import logging
 from requests_oauthlib import OAuth1Session, OAuth2Session, oauth1_session
 from oauthlib.oauth2 import BackendApplicationClient
 
-logger = logging.getLogger()
 
 KEYS = {
     'consumer_key': os.environ['CONSUMER_KEY'],
@@ -31,7 +29,8 @@ URLS = {
         "friends": "https://api.twitter.com/1.1/friends/list.json",
         "list_status": "https://api.twitter.com/1.1/lists/statuses.json",
         "user_timeline": "https://api.twitter.com/1.1/statuses/user_timeline.json",
-        "trends": "https://api.twitter.com/1.1/trends/place.json"
+        "trends": "https://api.twitter.com/1.1/trends/place.json",
+        "geosearch": "https://api.twitter.com/1.1/geo/search.json"
     },
     'post': {
         "favorite-create": "https://api.twitter.com/1.1/favorites/create.json",
@@ -40,6 +39,10 @@ URLS = {
         "unretweet": "https://api.twitter.com/1.1/statuses/unretweet/{0}.json"
     }
 }
+
+
+class RequestDenied(Exception):
+    pass
 
 
 def get_tweet_url(twtype, params={}):
@@ -52,16 +55,14 @@ def get_tweet_url(twtype, params={}):
     elif twtype in URLS['get'].keys():
         url = URLS['get'][twtype]
         method = "get"
-
     return url, method
 
 
-def get_tweets(access_token, twtype, params={}, ):
+def get_tweets(access_token, twtype, params={}):
     oauth = OAuth1Session(KEYS['consumer_key'],
                 client_secret=KEYS['consumer_secret'],
                 resource_owner_key=access_token['oauth_token'],
                 resource_owner_secret=access_token['oauth_token_secret'])
-
     url, method = get_tweet_url(twtype, params)
 
     try:
@@ -69,16 +70,44 @@ def get_tweets(access_token, twtype, params={}, ):
             res = oauth.get(url, params=params)
         elif method == "post":
             res = oauth.post(url, params=params)
-
-        result = json.loads(res.text)
-
     except oauth1_session.TokenRequestDenied as detail:
-        logger.error(detail)
-        raise RequestDenied(detail)
-    except (ValueError, TypeError) as detail:
-        logger.error(res.text)
         raise RequestDenied(detail)
 
+    try:
+        result = json.loads(res.text)
+    except (ValueError, TypeError):
+        raise
+    return result
+
+
+def get_oath2_access_token():
+    client = BackendApplicationClient(client_id=KEYS['consumer_key'])
+    oauth = OAuth2Session(client=client)
+    token = oauth.fetch_token(token_url=URLS['oauth']['oauth2_token'],
+                client_id=KEYS['consumer_key'],
+                client_secret=KEYS['consumer_secret'])
+    access_token = token['access_token']
+    return access_token
+
+
+def get_oath2_tweets(access_token, twtype, params={}):
+    client = BackendApplicationClient(client_id=KEYS['consumer_key'],
+                access_token=access_token)
+    oauth = OAuth2Session(client=client, token=access_token)
+    url, method = get_tweet_url(twtype, params)
+
+    try:
+        if method == "get":
+            res = oauth.get(url, params=params)
+        elif method == "post":
+            res = oauth.post(url, params=params)
+    except oauth1_session.TokenRequestDenied as detail:
+        raise RequestDenied(detail)
+
+    try:
+        result = json.loads(res.text)
+    except (ValueError, TypeError):
+        raise
     return result
 
 
@@ -104,13 +133,7 @@ def get_access_token(request_token):
         access_token = oauth.fetch_access_token(URLS['oauth']['access_token'])
     except oauth1_session.TokenRequestDenied as detail:
         raise RequestDenied(detail)
-
-    logger.debug("access_token: {}".format(access_token))
     return access_token
-
-
-class RequestDenied(Exception):
-    pass
 
 
 ### Execute
