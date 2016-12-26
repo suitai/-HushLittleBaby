@@ -1,3 +1,6 @@
 [submodule "static/lightbox2"]
 	path = static/lightbox2
 	url = https://github.com/lokesh/lightbox2.git
+[submodule "static/iconate"]
+	path = static/iconate
+	url = https://github.com/bitshadow/iconate.git
