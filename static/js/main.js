@@ -48,10 +48,9 @@ var append_lists = function(data, result)
 
 $(function()
 {
-    $.get("_get_tweet_template", function(data) { tweet_tmpl = data; });
-    $.get("_get_tweets_head", function(data) { $('.content').prepend(data); });
-
     //var geo = get_geo();
+
+    $.get("_get_tweets_head", function(data) { $('.content').prepend(data); });
 
     write_tweets({
         twtype: "lists",
@@ -64,12 +63,16 @@ $(function()
         dest: "select[name='following']"
     }, append_lists);
 
-    params = {count: 100};
-    write_tweets({
-        twtype: "home_timeline",
-        params: params,
-        dest: "div.tweets"
-    }, append_tweets);
+    $.get("_get_tweet_template", function(data) {
+        tweet_tmpl = data;
+    }).done(function (result) {
+        params = {count: 100};
+        write_tweets({
+            twtype: "home_timeline",
+            params: params,
+            dest: "div.tweets"
+        }, append_tweets);
+    });
 
     $("button.timeline").on('click', function() {
         $('div.tweet').remove();
