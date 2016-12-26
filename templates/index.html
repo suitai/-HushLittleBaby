@@ -2,7 +2,10 @@
     <head>
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript" src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='iconate/dist/iconate.min.css') }}">
         <script type="text/javascript" src="{{ url_for('static', filename='iconate/dist/iconate.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
@@ -16,20 +19,31 @@
             <div class=user>
                  {{ screen_name }} / <a href="/logout">logout</a>
             </div>
-            <span class="twtype-button">
-                <button class="timeline" type="button">TimeLine</button>
-                <button class="favorites" type="button">Likes</button>
-                <select class="lists" name="lists">
-                    <option value="">Lists</option>
-                </select>
-                <select class="following" name="following">
-                    <option value="">Following</option>
-                </select>
+            <span class="twtype-button row">
+                <div class="col-xs-11">
+                    <div class="col-xs-1">
+                        <button class="btn timeline btn-default" type="button">TimeLine</button>
+                    </div>
+                    <div class="col-xs-1">
+                        <button class="btn favorites btn-default" type="button">Likes</button>
+                    </div>
+                    <div class="col-xs-3">
+                        <select class="lists form-control" name="lists">
+                            <option value="">Lists</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-3">
+                        <select class="following form-control" name="following">
+                            <option value="">Following</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-4">
+                        <form class="search-form" name="search">
+                            <input class="form-control" type="text" id="search-text" name="search" placeholder="Search" area-describedby="glass">
+                        </form>
+                    </div>
+                </div>
             </span>
-            <form class="search-form" name="search">
-                <input type="text" id="search-text" name="search" placeholder="Search" area-describedby="glass">
-                <input type="submit" id="search-submit" value="🔍 ">
-            </form>
         </div>
         <div class="content">
             <div class="tweet-newer">
