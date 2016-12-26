@@ -5,10 +5,16 @@
         </a>
     </div>
     <div class="user" data-user_id=${user_id}>
-        <a href="https://twitter.com/${user_screen_name}" target="_blank">${user_name}</a>
+        <a href="https://twitter.com/${user_screen_name}/status/${id}" target="_blank">${user_name}</a>
     </div>
     <div class="count">
-        <span class=retweet-count data-retweeted=${retweeted}>⇄ ${retweet_count}</span>
-        <span class=favorite-count data-favorited=${favorited}>❤ ${favorite_count}</span>
+        <span class=retweet-count data-retweeted=${retweeted}>
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+            <i class="retweet-num">${retweet_count}</i>
+        </span>
+        <span class=favorite-count data-favorited=${favorited}>
+            <i class="fa fa-heart" aria-hidden="true"></i>
+            <i class="favorite-num">${favorite_count}</i>
+        </span>
     </div>
 </div>
