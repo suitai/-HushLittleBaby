@@ -18,6 +18,9 @@ assets.url = app.static_url_path
 scss = Bundle('scss/style.scss', filters='pyscss', output='css/style.css')
 assets.register('style_scss', scss)
 
+logout_page = '/logout'
+login_page = '/login'
+
 
 class TweetError(Exception):
     pass
@@ -31,7 +34,7 @@ class TokenError(Exception):
 def before_request():
     if request.path == '/login':
         return
-    elif request.path == '/logout':
+    elif request.path == logout_page:
         return
     elif request.path[-4:] == ".css":
         return
@@ -57,10 +60,10 @@ def login():
     return redirect(redirect_url)
 
 
-@app.route('/logout', methods=['GET'])
+@app.route(logout_page, methods=['GET'])
 def logout():
     clean_session()
-    return redirect('/login')
+    return redirect(login_page)
 
 
 @app.route('/', methods=['GET'])
@@ -69,12 +72,16 @@ def index():
         request_token = get_request_token()
         access_token = get_access_token(request_token)
 
+    except TokenError as detail:
+        app.logger.error(detail)
+        return redirect(login_page)
+
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
-        return redirect('/logout')
+        return redirect(logout_page)
 
     except TokenError:
-        return redirect('/logout')
+        return redirect(logout_page)
 
     return render_template('index.html', screen_name=access_token['screen_name'])
 
@@ -106,6 +113,10 @@ def _get_tweets_js():
         request_token = get_request_token()
         access_token = get_access_token(request_token)
         tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
+
+    except TokenError as detail:
+        app.logger.error(detail)
+        return redirect(login_page)
 
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
@@ -153,9 +164,13 @@ def _get_tweets():
         access_token = get_access_token(request_token)
         tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
 
+    except TokenError as detail:
+        app.logger.error(detail)
+        return redirect(login_page)
+
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
-        return redirect('/logout')
+        return redirect(logout_page)
 
     try:
         check_tweets(tweets)
@@ -174,9 +189,13 @@ def _post_tweets():
         access_token = get_access_token(request_token)
         tweets = tweet.get_tweets(access_token, request.json['twtype'], request.json['params'])
 
+    except TokenError as detail:
+        app.logger.error(detail)
+        return redirect(login_page)
+
     except tweet.RequestDenied as detail:
         app.logger.error(detail)
-        return redirect('/logout')
+        return redirect(logout_page)
 
     try:
         check_tweets(tweets)
@@ -206,9 +225,15 @@ def get_request_token():
     if 'request_token' in session:
         request_token = session['request_token']
     else:
-        request_token = {'oauth_token': request.args.get('oauth_token'),
-                         'oauth_verifier': request.args.get('oauth_verifier')}
-        session['request_token'] = request_token
+        oauth_token = request.args.get('oauth_token')
+        oauth_verifier = request.args.get('oauth_verifier')
+        if oauth_token is None or oauth_verifier is None:
+            raise TokenError('cannot get request token')
+
+        else:
+            request_token = {'oauth_token': oauth_token,
+                             'oauth_verifier': oauth_verifier}
+            session['request_token'] = request_token
 
     return request_token
 
