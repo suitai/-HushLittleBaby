@@ -1,3 +1,4 @@
+$form-size: 250px;
 $tweet-size: 250px;
 $img-size: 200px;
 $tweet-font-size: 12px;
@@ -12,18 +13,19 @@ $default-color: #666666;
     background-color: $menu-color;
     h1 {
         margin-left: 10px;
-        margin-top: 0px;
+        margin-top: 5px;
         margin-bottom: 0px;
     }
     .user {
         text-align: right;
         margin-right: 10px;
     }
-    .twtype-button {
-        margin-left: 10px;
+    .tw-menu {
+        margin-left: 5px;
+        margin-bottom: 5px;
     }
-    .search-form {
-        margin-left: 10px;
+    .tw-form{
+        width: $form-size;
     }
 }
 
