@@ -8,12 +8,12 @@ var prepend_tweets = function(data, result)
         return;
     }
     $('div.tweet').each(function (i, elem) {
-        array.push($(elem).attr('data-id'));
+        array.push($(elem).attr('data-id-org'));
     });
     for (key in result) {
-        if (($.inArray(result[key]['id'], array) == -1)) {
+        if (($.inArray(result[key]['id_org'], array) == -1)) {
             $.tmpl(tweet_tmpl, result[key]).prependTo(data.dest);
-            array.push(result[key]['id']);
+            array.push(result[key]['id_org']);
         }
     }
     $('div.tweet-content').attr('data-twtype', data.twtype);
@@ -28,12 +28,12 @@ var append_tweets = function(data, result)
         return;
     }
     $('div.tweet').each(function (i, elem) {
-        array.push($(elem).attr('data-id'));
+        array.push($(elem).attr('data-id-org'));
     });
     for (key in result) {
-        if (($.inArray(result[key]['id'], array) == -1)) {
+        if (($.inArray(result[key]['id_org'], array) == -1)) {
             $.tmpl(tweet_tmpl, result[key]).appendTo(data.dest);
-            array.push(result[key]['id']);
+            array.push(result[key]['id_org']);
         }
     }
     $('div.tweet-content').attr('data-twtype', data.twtype)
