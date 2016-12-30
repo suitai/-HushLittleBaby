@@ -322,7 +322,9 @@ def filter_tweets(tweets):
         tweet_id = str(tw['id'])
         if 'retweeted_status' in tw.keys():
             tw = tw['retweeted_status']
+        tweet_id_org = str(tw['id'])
         tmp_tw = {'id': tweet_id,
+                  'id_org': tweet_id_org,
                   'media_url_https': tw['entities']['media'][0]['media_url_https'],
                   'user_id': tw['user']['id'],
                   'user_screen_name': tw['user']['screen_name'],
