@@ -52,73 +52,41 @@ $(function()
 
     $.get("_get_tweets_head", function(data) { $('.content').prepend(data); });
 
-    write_tweets({
-        twtype: "lists",
-        params: {},
-        dest: "select[name='lists']"
-    }, append_lists);
-    write_tweets({
-        twtype: "friends",
-        params: {count: 200},
-        dest: "select[name='following']"
-    }, append_lists);
+    write_tweets({twtype: "lists", params: {count: 200}, dest: '#lists'}, append_lists);
+    write_tweets({twtype: "friends", params: {count: 200}, dest: '#following'}, append_lists);
 
     $.get("_get_tweet_template", function(data) {
         tweet_tmpl = data;
     }).done(function (result) {
         params = {count: 100};
-        write_tweets({
-            twtype: "home_timeline",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        write_tweets({twtype: "home_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
 
-    $("button.timeline").on('click', function() {
+    $('#timeline').on('click', function() {
         $('div.tweet').remove();
         params = {count: 100};
-        write_tweets({
-            twtype: "home_timeline",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        write_tweets({twtype: "home_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
-    $("button.favorites").on('click', function() {
+    $('#favorites').on('click', function() {
         $('div.tweet').remove();
         params = {count: 100};
-        write_tweets({
-            twtype: "favorites",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        write_tweets({twtype: "favorites", params: params, dest: 'div.tweets'}, append_tweets);
     });
-    $("select.lists").change(function() {
+    $('#lists').change(function() {
         $('div.tweet').remove();
-        params = {list_id: $("select.lists option:selected").val(), count: 100};
-        write_tweets({
-            twtype: "list_status",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        params = {list_id: $('#lists option:selected').val(), count: 100};
+        write_tweets({twtype: "list_status", params: params, dest: 'div.tweets'}, append_tweets);
     });
-    $("select.following").change(function() {
+    $('#following').change(function() {
         $('div.tweet').remove();
-        params = {user_id: $("select.following option:selected").val(), count: 100};
-        write_tweets({
-            twtype: "user_timeline",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        params = {user_id: $('#following option:selected').val(), count: 100};
+        write_tweets({twtype: "user_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
-    $("form[name='search']").submit(function(event) {
+    $('#search').submit(function(event) {
         event.preventDefault();
         $('div.tweet').remove();
-        params = {q: $(":text[name='search']").val(), count: 100};
-        write_tweets({
-            twtype: "search",
-            params: params,
-            dest: "div.tweets"
-        }, append_tweets);
+        params = {q: $('#search-text').val(), count: 100};
+        write_tweets({twtype: "search", params: params, dest: 'div.tweets'}, append_tweets);
     });
 
     $(document).on('click', 'div.tweet-newer' , function() {
@@ -129,11 +97,8 @@ $(function()
             animation: 'fadeOutTop'
         });
         tmp_params['since_id'] = $('div.tweet').eq(0).attr('data-id');
-        write_tweets({
-            twtype: $('div.tweet-content').attr('data-twtype'),
-            params: tmp_params,
-            dest: "div.tweets"
-        }, prepend_tweets);
+        twtype = $('div.tweet-content').attr('data-twtype');
+        write_tweets({twtype: twtype, params: tmp_params, dest: 'div.tweets'}, prepend_tweets);
     });
     $(document).on('click', 'div.tweet-older' , function() {
         var tmp_params = $.extend(true, {}, params);
@@ -143,11 +108,8 @@ $(function()
             animation: 'fadeOutBottom'
         });
         tmp_params['max_id'] = $('div.tweet').eq(-1).attr('data-id');
-        write_tweets({
-            twtype: $('div.tweet-content').attr('data-twtype'),
-            params: tmp_params,
-            dest: "div.tweets"
-        }, append_tweets);
+        twtype = $('div.tweet-content').attr('data-twtype');
+        write_tweets({twtype: twtype, params: tmp_params, dest: 'div.tweets'}, append_tweets);
     });
 
     $(document).on('click', 'span.retweet-count' , function() {
@@ -241,27 +203,27 @@ function loading_image(status)
     $('div.fade').css("height", height);
 
     if (status == true) {
-        $("div.loader").fadeIn(200);
-        $("div.fade").fadeIn(200);
+        $('div.loader').fadeIn(200);
+        $('div.fade').fadeIn(200);
     } else {
-        $("div.fade").delay(300).fadeOut(200);
-        $("div.loader").delay(300).fadeOut(200);
+        $('div.fade').delay(300).fadeOut(200);
+        $('div.loader').delay(300).fadeOut(200);
     }
 }
 
 function disable_button(status)
 {
-    $("button.timeline").prop('disabled', status);
-    $("button.favorites").prop('disabled', status);
-    $("select.lists").prop('disabled', status);
-    $("select.following").prop('disabled', status);
-    $("form.search-form").prop('disabled', status);
+    $('#timeline').prop('disabled', status);
+    $('#favorites').prop('disabled', status);
+    $('#lists').prop('disabled', status);
+    $('#following').prop('disabled', status);
+    $('#search').prop('disabled', status);
     if (status == true) {
-        $("div.tweet-newer").css('pointer-events', "none");
-        $("div.tweet-older").css('pointer-events', "none");
+        $('div.tweet-newer').css('pointer-events', "none");
+        $('div.tweet-older').css('pointer-events', "none");
     } else {
-        $("div.tweet-newer").css('pointer-events', "auto");
-        $("div.tweet-older").css('pointer-events', "auto");
+        $('div.tweet-newer').css('pointer-events', "auto");
+        $('div.tweet-older').css('pointer-events', "auto");
     }
     loading_image(status);
 }
