@@ -69,6 +69,7 @@ $default-color: #666666;
 .tweets {
     display: flex;
     flex-flow: wrap;
+    justify-content: center;
     align-items: center;
 
     .tweet {
