@@ -324,7 +324,7 @@ def filter_tweets(tweets):
         tweet_id_org = str(tw['id'])
         tmp_tw = {'id': tweet_id,
                   'id_org': tweet_id_org,
-                  'media_url_https': tw['entities']['media'][0]['media_url_https'],
+                  'media_url_https': [],
                   'user_id': tw['user']['id'],
                   'user_screen_name': tw['user']['screen_name'],
                   'user_name': tw['user']['name'],
@@ -333,6 +333,14 @@ def filter_tweets(tweets):
                   'favorite_count': tw['favorite_count'],
                   'retweeted': tw['retweeted'],
                   'favorited': tw['favorited']}
+        if 'extended_entities' in tw.keys():
+            medias = tw['extended_entities']['media']
+        else:
+            medias = tw['entities']['media']
+
+        for media in medias:
+            tmp_tw['media_url_https'].append(media['media_url_https'])
+
         send_tweets.append(tmp_tw)
     return send_tweets
 
