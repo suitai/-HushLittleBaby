@@ -3,9 +3,8 @@
 
 
 import os
-import json
 from datetime import timedelta
-from flask import Flask, session, request, redirect, render_template, flash, jsonify
+from flask import Flask, session, request, redirect, render_template, jsonify, send_file
 from flask_assets import Environment, Bundle
 from lib import tweet
 
@@ -103,7 +102,7 @@ def _get_tweets_head():
 
 @app.route('/_get_tweet_template')
 def _get_tweet_template():
-    return render_template('tweet.html')
+    return send_file('templates/tweet.html')
 
 
 @app.route('/_get_tweets_js', methods=['POST'])
