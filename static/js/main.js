@@ -1,5 +1,9 @@
 
+const TWEET_COUNT = 200;
+const LIST_COUNT = 150;
+
 var tweet_array = [];
+var params = {};
 
 var prepend_tweets = function(data, result)
 {
@@ -64,40 +68,40 @@ $(function()
 
     $.get("_get_tweets_head", function(data) { $('.content').prepend(data); });
 
-    write_tweets({twtype: "lists", params: {count: 200}, dest: '#lists'}, append_lists);
-    write_tweets({twtype: "friends", params: {count: 200}, dest: '#following'}, append_lists);
+    write_tweets({twtype: "lists", params: {count: LIST_COUNT}, dest: '#lists'}, append_lists);
+    write_tweets({twtype: "friends", params: {count: LIST_COUNT}, dest: '#following'}, append_lists);
 
     $.get("_get_tweet_template", function(data) {
         tweet_tmpl = data;
     }).done(function (result) {
-        params = {count: 100};
+        params = {count: TWEET_COUNT};
         write_tweets({twtype: "home_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
 
     $('#timeline').on('click', function() {
         $('div.tweet').remove();
-        params = {count: 100};
+        params = {count: TWEET_COUNT};
         write_tweets({twtype: "home_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#favorites').on('click', function() {
         $('div.tweet').remove();
-        params = {count: 100};
+        params = {count: TWEET_COUNT};
         write_tweets({twtype: "favorites", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#lists').change(function() {
         $('div.tweet').remove();
-        params = {list_id: $('#lists option:selected').val(), count: 100};
+        params = {list_id: $('#lists option:selected').val(), count: TWEET_COUNT};
         write_tweets({twtype: "list_status", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#following').change(function() {
         $('div.tweet').remove();
-        params = {user_id: $('#following option:selected').val(), count: 100};
+        params = {user_id: $('#following option:selected').val(), count: TWEET_COUNT};
         write_tweets({twtype: "user_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#search').submit(function(event) {
         event.preventDefault();
         $('div.tweet').remove();
-        params = {q: $('#search-text').val(), count: 100};
+        params = {q: $('#search-text').val(), count: TWEET_COUNT};
         write_tweets({twtype: "search", params: params, dest: 'div.tweets'}, append_tweets);
     });
 
