@@ -1,54 +1,52 @@
 
+var tweet_array = [];
+
 var prepend_tweets = function(data, result)
 {
-    var array = [];
-
     if (result['error']) {
         error_alert(result['error']);
         return;
     }
 
+    if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
+        tweet_array = [];
+    }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-max-id', result['max_id']);
     if (! $('div.tweet-content').attr('data-since-id')) {
         $('div.tweet-content').attr('data-since-id', result['since_id']);
     }
 
-    $('div.tweet').each(function (i, elem) {
-        array.push($(elem).attr('data-id-org'));
-    });
     tweets = result['tweets']
     for (key in tweets) {
-        if (($.inArray(tweets[key]['id_org'], array) == -1)) {
+        if (($.inArray(tweets[key]['id_org'], tweet_array) == -1)) {
             $.tmpl(tweet_tmpl, tweets[key]).prependTo(data.dest);
-            array.push(tweets[key]['id_org']);
+            tweet_array.push(tweets[key]['id_org']);
         }
     }
 }
 
 var append_tweets = function(data, result)
 {
-    var array = [];
-
     if (result['error']) {
         error_alert(result['error']);
         return;
     }
 
+    if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
+        tweet_array = [];
+    }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-since-id', result['since_id']);
     if (! $('div.tweet-content').attr('data-max-id')) {
         $('div.tweet-content').attr('data-max-id', result['max_id']);
     }
 
-    $('div.tweet').each(function (i, elem) {
-        array.push($(elem).attr('data-id-org'));
-    });
     tweets = result['tweets']
     for (key in tweets) {
-        if (($.inArray(tweets[key]['id_org'], array) == -1)) {
+        if (($.inArray(tweets[key]['id_org'], tweet_array) == -1)) {
             $.tmpl(tweet_tmpl, tweets[key]).appendTo(data.dest);
-            array.push(tweets[key]['id_org']);
+            tweet_array.push(tweets[key]['id_org']);
         }
     }
 }
