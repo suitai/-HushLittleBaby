@@ -12,10 +12,6 @@ var prepend_tweets = function(data, result)
         return;
     }
 
-    if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
-        tweet_array = [];
-        $('div.tweet-content').removeAttr('data-since-id data-max-id');
-    }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-max-id', result['max_id']);
     if (! $('div.tweet-content').attr('data-since-id')) {
@@ -38,10 +34,6 @@ var append_tweets = function(data, result)
         return;
     }
 
-    if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
-        tweet_array = [];
-        $('div.tweet-content').removeAttr('data-since-id data-max-id');
-    }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-since-id', result['since_id']);
     if (! $('div.tweet-content').attr('data-max-id')) {
@@ -81,28 +73,28 @@ $(function()
     });
 
     $('#timeline').on('click', function() {
-        $('div.tweet').remove();
+        initialize_tweets();
         params = {count: TWEET_COUNT};
         write_tweets({twtype: "home_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#favorites').on('click', function() {
-        $('div.tweet').remove();
+        initialize_tweets();
         params = {count: TWEET_COUNT};
         write_tweets({twtype: "favorites", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#lists').change(function() {
-        $('div.tweet').remove();
+        initialize_tweets();
         params = {list_id: $('#lists option:selected').val(), count: TWEET_COUNT};
         write_tweets({twtype: "list_status", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#following').change(function() {
-        $('div.tweet').remove();
+        initialize_tweets();
         params = {user_id: $('#following option:selected').val(), count: TWEET_COUNT};
         write_tweets({twtype: "user_timeline", params: params, dest: 'div.tweets'}, append_tweets);
     });
     $('#search').submit(function(event) {
         event.preventDefault();
-        $('div.tweet').remove();
+        initialize_tweets();
         params = {q: $('#search-text').val(), count: TWEET_COUNT};
         write_tweets({twtype: "search", params: params, dest: 'div.tweets'}, append_tweets);
     });
@@ -214,6 +206,13 @@ $(function()
         $(this).css('background-color', "#ffffff");
     });
 });
+
+function initialize_tweets()
+{
+    $('div.tweet').remove();
+    tweet_array = [];
+    $('div.tweet-content').removeAttr('data-since-id data-max-id');
+}
 
 function loading_image(status)
 {
