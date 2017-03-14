@@ -14,6 +14,7 @@ var prepend_tweets = function(data, result)
 
     if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
         tweet_array = [];
+        $('div.tweet-content').removeAttr('data-since-id data-max-id');
     }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-max-id', result['max_id']);
@@ -39,6 +40,7 @@ var append_tweets = function(data, result)
 
     if (data.twtype != $('div.tweet-content').attr('data-twtype')) {
         tweet_array = [];
+        $('div.tweet-content').removeAttr('data-since-id data-max-id');
     }
     $('div.tweet-content').attr('data-twtype', data.twtype);
     $('div.tweet-content').attr('data-since-id', result['since_id']);
