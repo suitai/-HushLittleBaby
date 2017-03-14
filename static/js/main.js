@@ -7,16 +7,23 @@ var prepend_tweets = function(data, result)
         error_alert(result['error']);
         return;
     }
+
+    $('div.tweet-content').attr('data-twtype', data.twtype);
+    $('div.tweet-content').attr('data-max-id', result['max_id']);
+    if (! $('div.tweet-content').attr('data-since-id')) {
+        $('div.tweet-content').attr('data-since-id', result['since_id']);
+    }
+
     $('div.tweet').each(function (i, elem) {
         array.push($(elem).attr('data-id-org'));
     });
-    for (key in result) {
-        if (($.inArray(result[key]['id_org'], array) == -1)) {
-            $.tmpl(tweet_tmpl, result[key]).prependTo(data.dest);
-            array.push(result[key]['id_org']);
+    tweets = result['tweets']
+    for (key in tweets) {
+        if (($.inArray(tweets[key]['id_org'], array) == -1)) {
+            $.tmpl(tweet_tmpl, tweets[key]).prependTo(data.dest);
+            array.push(tweets[key]['id_org']);
         }
     }
-    $('div.tweet-content').attr('data-twtype', data.twtype);
 }
 
 var append_tweets = function(data, result)
@@ -27,16 +34,23 @@ var append_tweets = function(data, result)
         error_alert(result['error']);
         return;
     }
+
+    $('div.tweet-content').attr('data-twtype', data.twtype);
+    $('div.tweet-content').attr('data-since-id', result['since_id']);
+    if (! $('div.tweet-content').attr('data-max-id')) {
+        $('div.tweet-content').attr('data-max-id', result['max_id']);
+    }
+
     $('div.tweet').each(function (i, elem) {
         array.push($(elem).attr('data-id-org'));
     });
-    for (key in result) {
-        if (($.inArray(result[key]['id_org'], array) == -1)) {
-            $.tmpl(tweet_tmpl, result[key]).appendTo(data.dest);
-            array.push(result[key]['id_org']);
+    tweets = result['tweets']
+    for (key in tweets) {
+        if (($.inArray(tweets[key]['id_org'], array) == -1)) {
+            $.tmpl(tweet_tmpl, tweets[key]).appendTo(data.dest);
+            array.push(tweets[key]['id_org']);
         }
     }
-    $('div.tweet-content').attr('data-twtype', data.twtype)
 }
 
 var append_lists = function(data, result)
@@ -96,7 +110,7 @@ $(function()
             to: 'fa-caret-up',
             animation: 'fadeOutTop'
         });
-        tmp_params['since_id'] = $('div.tweet').eq(0).attr('data-id');
+        tmp_params['since_id'] = $('div.tweet-content').attr('data-max-id');
         twtype = $('div.tweet-content').attr('data-twtype');
         write_tweets({twtype: twtype, params: tmp_params, dest: 'div.tweets'}, prepend_tweets);
     });
@@ -107,7 +121,7 @@ $(function()
             to: 'fa-caret-down',
             animation: 'fadeOutBottom'
         });
-        tmp_params['max_id'] = $('div.tweet').eq(-1).attr('data-id');
+        tmp_params['max_id'] = $('div.tweet-content').attr('data-since-id');
         twtype = $('div.tweet-content').attr('data-twtype');
         write_tweets({twtype: twtype, params: tmp_params, dest: 'div.tweets'}, append_tweets);
     });

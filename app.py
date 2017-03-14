@@ -309,11 +309,14 @@ def filter_data(twtype, tweets):
 
 
 def filter_tweets(tweets):
-    send_tweets = []
 
     if isinstance(tweets, dict):
         if 'statuses' in tweets.keys():
             tweets = tweets['statuses']
+
+    send_tweets = {'since_id': tweets[-1]['id'],
+                   'max_id': tweets[0]['id'],
+                   'tweets': []}
 
     for tw in tweets:
         if 'media' not in tw['entities']:
@@ -341,7 +344,7 @@ def filter_tweets(tweets):
         for media in medias:
             tmp_tw['media_url_https'].append(media['media_url_https'])
 
-        send_tweets.append(tmp_tw)
+        send_tweets['tweets'].append(tmp_tw)
     return send_tweets
 
 
