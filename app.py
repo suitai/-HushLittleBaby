@@ -18,7 +18,7 @@ scss = Bundle('scss/style.scss', filters='pyscss', output='css/style.css')
 assets.register('style_scss', scss)
 
 logout_page = '/logout'
-login_page = '/login'
+login_page = '/top'
 
 
 class TweetError(Exception):
@@ -35,6 +35,8 @@ def before_request():
         return
     elif request.path == logout_page:
         return
+    elif request.path == login_page:
+        return
     elif request.path[-4:] == ".css":
         return
     elif request.path[-3:] == ".js":
@@ -42,7 +44,7 @@ def before_request():
     elif check_token():
         return
     else:
-        return redirect('/login')
+        return redirect(login_page)
 
 
 @app.route('/login', methods=['GET'])
@@ -57,6 +59,11 @@ def login():
         clean_session()
         raise
     return redirect(redirect_url)
+
+
+@app.route(login_page, methods=['GET'])
+def top():
+    return render_template('top.html')
 
 
 @app.route(logout_page, methods=['GET'])
